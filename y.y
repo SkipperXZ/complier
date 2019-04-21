@@ -8,7 +8,7 @@
 
 primary_expression
 	: IDENTIFIER
-| CONSTANT
+    | CONSTANT
 	| STRING_LITERAL
 	| HEX
 	;
