@@ -1,4 +1,0 @@
-(spim) load "prog3.s"
-(spim) run
-Input: 7
-5040
