@@ -214,9 +214,7 @@ def cal_func(stmt):
         div_func(stmt[1],stmt[2])          
 
 def add_func(first,second):
- 
     if (type(first) is str and check_var_not_duplicate(first)) or (type(second) is str and check_var_not_duplicate(second)):
-        
         Error.append("Unidentified Variable")
         sys.exit(Error)
     print_instr('mov  eax,%s'%first)
