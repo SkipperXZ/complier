@@ -88,6 +88,11 @@ def p_init_declarator_notassign(p):
     '''
     p[0] = p[1]
     
+def p_init_declarator_array(p):
+    '''
+    init_declarator : declarator LBK NUMBER RBK EQUALS expression
+    '''
+    p[0] = ('assign-value', p[1]+p[2]+str(p[3])+p[4], p[6])
 def p_init_declarator(p):
     '''
     init_declarator : declarator EQUALS expression
@@ -95,9 +100,9 @@ def p_init_declarator(p):
     p[0] = ('assign-value', p[1], p[3])
 def p_array_init_declarator(p):
     '''
-    init_declarator : declarator EQUALS LBK array_declarator RBK
+    init_declarator_array : declarator EQUALS LBK array_declarator RBK
     '''
-    p[0] = ('assign-array',p[1], p[4])
+    p[0] = (p[1], p[4])
 def p_array_number(p):
     '''
     array_declarator : NUMBER
@@ -108,11 +113,11 @@ def p_array_declarator(p):
     '''
     array_declarator : array_declarator COMMA NUMBER
     '''
-    p[0] = (',',p[1],p[3])
+    p[0] = (p[1],p[3])
     
 def p_array_declaration(p):
     '''
-    declaration : declaration_specifiers LBK NUMBER RBK init_declarator SEMICO
+    declaration : declaration_specifiers LBK NUMBER RBK init_declarator_array SEMICO
     '''
     p[0] = ('declare-array',p[3],p[5])
     
@@ -223,9 +228,8 @@ def p_error(p):
 parser = yacc.yacc()
 
 
-result = parser.parse(''' int64 a= 0;
-                          int64 b=0;
-                      if(a==b){a=1+1; if(a>b){} else{} }
+result = parser.parse(''' array [3] a = [1,2,3];  
+                          array [2] a = [4,5];
                       ''')
 #print(result)
 #print(asm_data)

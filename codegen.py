@@ -4,12 +4,14 @@ import sys
 #loop count
 count = 0
 count_IF = 1
+index = 0
 ELSE_stmt = []
-#------ joel
+
 # visit multiple statement  
 instr_list = []  
 data_list = ['.data'] 
 var_list = []
+array_var_list = []
 Error = []
 asm_data = '''.data
 
@@ -24,6 +26,7 @@ def check_var_not_duplicate(var_name):
             #print("%s == %s"%(var_list[i],var_name))
             return False
     return True
+
 def push(register):
     print_instr('push  %s'%register)
 def pop(register):
@@ -44,6 +47,10 @@ def base_statement(stmt):
             else:
                 print_instr("mov  eax,%s"%(stmt[1]))
             assign_value(stmt[1])
+        if stmt[0] == 'declare-array':
+            declar_array(stmt[1],stmt[2])
+#        if stmt[0] == 'assign-array':
+#            assign_array(stmt[1],stmt[2])     
         if stmt[0] == 'for':
             loop_statement(stmt[1],stmt[2])
         if stmt[0] == 'if':
@@ -51,6 +58,58 @@ def base_statement(stmt):
         if stmt[0] == 'else':
             ELSE_statement(stmt[1])
             
+def recur_assign_array(stmt):
+    if type(stmt[0]) is tuple:
+        recur_assign_array(stmt[0])
+    elif type(stmt[0]) is int:
+        array_var_list.append(stmt[0])
+    if type(stmt[1]) is tuple:
+        recur_assign_array(stmt[1])
+    elif type(stmt[1]) is int:  
+        array_var_list.append(stmt[1])
+        
+def declar_array(size,stmt):
+    global index
+    #if stmt[0] == 'assign-array':
+    recur_assign_array(stmt[1])
+    temp_str = '%s dd '%stmt[0]
+    temp_ele = ''
+    if not check_var_not_duplicate('%s[%s]'%(stmt[0],index)):
+        sys.exit('variable duplicate')
+        return
+    for ele in array_var_list:
+        temp_ele += str(ele) 
+        if array_var_list[len(array_var_list)-1] != ele:
+            temp_ele += ' , '
+        if check_var_not_duplicate('%s[%s]'%(stmt[0],index)):
+            var_list.append('%s[%s]'%(stmt[0],index))
+            index += 4
+    data_list.append(temp_str + temp_ele)
+    array_var_list.clear()
+    index = 0
+    #elif type(stmt[2]) is str:
+        #data_list.append('%s times %s dd 0'%(stmt[2],size))
+            
+#declarator EQUALS LBK array_declarator RBK
+'''
+def assign_array(name,stmt):
+    global index
+    if type(stmt[0]) is tuple:
+        assign_array(name,stmt[0])
+    elif type(stmt[0]) is int:
+        print_instr('mov	%s[%s], %s'%(name,index,stmt[0]))
+        if check_var_not_duplicate('%s[%s]'%(name,index)):
+            var_list.append('%s[%s]'%(name,index))
+        index += 4
+    if type(stmt[1]) is tuple:
+        assign_array(name,stmt[1])
+    elif type(stmt[1]) is int:
+        print_instr('mov	%s[%s], %s'%(name,index,stmt[1]))
+        if check_var_not_duplicate('%s[%s]'%(name,index)):
+            var_list.append('%s[%s]'%(name,index))
+        index += 4
+'''
+        
 def compare_value(stmt1,stmt2):
     global count_IF
     print_instr(' cmp        %s,    %s'%(stmt1[1],stmt1[2]))
