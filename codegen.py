@@ -37,10 +37,13 @@ def base_statement(stmt):
         if stmt[0] == 'declare-value':  
             declar_var(stmt[1])
         if stmt[0] == 'assign-value':  
-            if type(stmt[1]) is str and check_var_not_duplicate(stmt[1]):
+            if type(stmt[1]) is str  and type(stmt[2]) is int:
+                print_instr("mov    %s,%s"%(stmt[1],stmt[2]))
+                return
+            elif type(stmt[1]) is str and check_var_not_duplicate(stmt[1]):
                     Error.append("Unidentified Variable")
                     sys.exit(Error)
-            if type(stmt[2]) is tuple:
+            elif type(stmt[2]) is tuple:
                 cal_func(stmt[2])
             else:
                 if type(stmt[1]) is str and check_var_not_duplicate(stmt[1]):
