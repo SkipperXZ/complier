@@ -40,18 +40,18 @@ def base_statement(stmt):
         if stmt[0] == 'declare-value':  
             declar_var(stmt[1])
         if stmt[0] == 'assign-value':  
-            if type(stmt[1]) is str  and type(stmt[2]) is int:
-                print_instr("mov    %s,%s"%(stmt[1],stmt[2]))
-                return
-            elif type(stmt[1]) is str and check_var_not_duplicate(stmt[1]):
+            if type(stmt[1]) is str and check_var_not_duplicate(stmt[1]):
+                Error.append("Unidentified Variable")
+                sys.exit(Error)
+            elif (type(stmt[1]) is str  and type(stmt[2]) is int) or (type(stmt[1]) is str  and type(stmt[2]) is str):
+                if check_var_not_duplicate(stmt[1]) or check_var_not_duplicate(stmt[2]):
                     Error.append("Unidentified Variable")
                     sys.exit(Error)
+                print_instr("mov    %s,%s"%(stmt[1],stmt[2]))
+                return
             elif type(stmt[2]) is tuple:
                 cal_func(stmt[2])
             else:
-                if type(stmt[1]) is str and check_var_not_duplicate(stmt[1]):
-                    Error.append("Unidentified Variable")
-                    sys.exit(Error)
                 print_instr("mov  eax,%s"%(stmt[1]))
             assign_value(stmt[1])
         if stmt[0] == 'declare-array':
@@ -143,9 +143,10 @@ def ELSE_statement(stmt):
     ELSE_stmt.pop(len(ELSE_stmt)-1)
 
 def assign_value(var_name):
-    if type(var_name) is str and check_var_not_duplicate(var_name):
+    if check_var_not_duplicate(var_name):
         Error.append("Unidentified Variable")
         sys.exit(Error)
+    
     print_instr("mov  %s,eax"%var_name)
 
 def cal_func(stmt):
@@ -213,7 +214,9 @@ def cal_func(stmt):
         div_func(stmt[1],stmt[2])          
 
 def add_func(first,second):
+ 
     if (type(first) is str and check_var_not_duplicate(first)) or (type(second) is str and check_var_not_duplicate(second)):
+        
         Error.append("Unidentified Variable")
         sys.exit(Error)
     print_instr('mov  eax,%s'%first)
