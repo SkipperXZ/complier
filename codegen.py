@@ -1,4 +1,5 @@
 from y import result
+import sys
 
 #loop count
 count = 0
@@ -7,6 +8,7 @@ ELSE_stmt = []
 #------ joel
 # visit multiple statement     
 var_list = []
+Error = []
 asm_data = '''.data
 
             '''
@@ -123,21 +125,33 @@ def cal_func(stmt):
         div_func(stmt[1],stmt[2])       
 
 def add_func(first,second):
+    if type(first) is str and check_var_not_duplicate(first):
+        Error.append("Unidentified Variable")
+        sys.exit(Error)
     print('mov  eax,%s'%first)
     print('add  eax,%s'%second)
 
  
-def sub_func(first,second):    
+def sub_func(first,second):
+    if type(first) is str and check_var_not_duplicate(first):
+        Error.append("Unidentified Variable")
+        sys.exit(Error)    
     print('mov  eax,%s'%first)
     print('sub  eax,%s'%second)
 
-def mul_func(first,second):    
+def mul_func(first,second):
+    if type(first) is str and check_var_not_duplicate(first):
+        Error.append("Unidentified Variable")
+        sys.exit(Error)  
     print('mov  eax,%s'%first)
     print('mov  ebx,%s'%second)
     print('mul  ebx')    
     
 
-def div_func(first,second): 
+def div_func(first,second):
+    if type(first) is str and check_var_not_duplicate(first):
+        Error.append("Unidentified Variable")
+        sys.exit(Error)
     print('mov  eax,%s'%first)
     print('mov  ecx,%s'%second)
     print('div  ecx')    
@@ -186,3 +200,4 @@ while True:
 #print(asm_data)
 
 base_statement(result)
+print(Error)
