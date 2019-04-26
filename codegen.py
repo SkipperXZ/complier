@@ -18,6 +18,11 @@ asm_data = '''.data
             '''
             
 def print_instr(instr):
+    
+    for i in var_list:
+        splited_1 = i.split('[')
+        splited_2 = splited_1[1].split(']')
+        instr = instr.replace(i, splited_1[0]+'['+ str(int(splited_2[0])*4) +']'+splited_2[1])
     instr_list.append(instr)        
             
 def check_var_not_duplicate(var_name):
@@ -90,7 +95,7 @@ def declar_array(size,stmt):
             temp_ele += ' , '
         if check_var_not_duplicate('%s[%s]'%(stmt[0],index)):
             var_list.append('%s[%s]'%(stmt[0],index))
-            index += 4
+            index += 1
     data_list.append(temp_str + temp_ele)
     array_var_list.clear()
     index = 0
@@ -244,7 +249,7 @@ def div_func(first,second):
     print_instr('mov  ecx,%s'%second)
     print_instr('div  ecx')    
  
-def div_func(first,second):
+def mod_func(first,second):
     if (type(first) is str and check_var_not_duplicate(first)) or (type(second) is str and check_var_not_duplicate(second)):
         Error.append("Unidentified Variable")
         sys.exit(Error)

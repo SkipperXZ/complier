@@ -40,6 +40,11 @@ def p_signed_number(p):
     '''
     p[0] = -p[2]
     
+def p_expression_array(p):
+    '''
+    expression : NAME LBK NUMBER RBK
+    '''
+    p[0] = p[1]+p[2]+str(p[3])+p[4]
 def p_expression_number(p):
     '''
       expression : signed_number
@@ -121,6 +126,11 @@ def p_array_declaration(p):
     '''
     p[0] = ('declare-array',p[3],p[5])
     
+def p_array_as_name(p):
+    '''
+    declarator : NAME LBK NUMBER RBK
+    '''
+    p[0] = p[1]+p[2]+str(p[3])+p[4]
 def p_declarator(p):
     '''
     declarator : NAME
@@ -229,7 +239,8 @@ parser = yacc.yacc()
 
 
 result = parser.parse(''' array [3] a = [1,2,3];  
-                          array [2] a = [4,5];
+                      
+                          a[0] = a[1]+6-a[1]%3;
                       ''')
 #print(result)
 #print(asm_data)
