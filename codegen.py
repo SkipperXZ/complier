@@ -2,7 +2,8 @@ from y import result
 
 #loop count
 count = 0
-
+count_IF = 1
+ELSE_stmt = []
 #------ joel
 # visit multiple statement     
 var_list = []
@@ -37,6 +38,35 @@ def base_statement(stmt):
             assign_value(stmt[1])
         if stmt[0] == 'for':
             loop_statement(stmt[1],stmt[2])
+        if stmt[0] == 'if':
+            compare_value(stmt[1],stmt[2])
+        if stmt[0] == 'else':
+            ELSE_statement(stmt[1])
+            
+def compare_value(stmt1,stmt2):
+    global count_IF
+    print(' cmp        %s,    %s'%(stmt1[1],stmt1[2]))
+    if stmt1[0] == '>':
+        print(' jg        else%d'%(count_IF))
+        ELSE_stmt.append(count_IF)
+    elif stmt1[0] == '<':
+        print(' jl         else%d'%(count_IF))
+        ELSE_stmt.append(count_IF)
+    elif stmt1[0] == '==':
+        print(' je         else%d'%(count_IF))
+        ELSE_stmt.append(count_IF)
+    elif stmt1[0] == '!=':
+        print(' jne        else%d'%(count_IF))
+        ELSE_stmt.append(count_IF)
+    count_IF+=1
+    base_statement(stmt2)
+
+def ELSE_statement(stmt):
+    print(' jmp      both%d'%(ELSE_stmt[len(ELSE_stmt)-1]))
+    print('else%s:'%(ELSE_stmt[len(ELSE_stmt)-1]))
+    base_statement(stmt)
+    print('both%s:'%(ELSE_stmt[len(ELSE_stmt)-1]))
+    ELSE_stmt.pop(len(ELSE_stmt)-1)
 
 def assign_value(var_name):
     print("mov  %s,eax"%var_name)
