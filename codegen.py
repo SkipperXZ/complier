@@ -148,7 +148,10 @@ def recursion_statement(stmt1,stmt2):
 
 
 def declar_var(stmt):
-    if stmt[0] == 'assign-value':
+    if not type(stmt) is tuple:
+        var_name = stmt
+        val = 0
+    elif stmt[0] == 'assign-value':
         var_name = stmt[1]
         val = stmt[2]
     if check_var_not_duplicate(var_name):
