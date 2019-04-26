@@ -6,12 +6,18 @@ count = 0
 count_IF = 1
 ELSE_stmt = []
 #------ joel
-# visit multiple statement     
+# visit multiple statement  
+instr_list = []  
+data_list = ['.data'] 
 var_list = []
 Error = []
 asm_data = '''.data
 
             '''
+            
+def print_instr(instr):
+    instr_list.append(instr)        
+            
 def check_var_not_duplicate(var_name):
     for i in range(len(var_list)):
         if(var_list[i] == var_name):
@@ -19,9 +25,9 @@ def check_var_not_duplicate(var_name):
             return False
     return True
 def push(register):
-    print('push  %s'%register)
+    print_instr('push  %s'%register)
 def pop(register):
-    print('pop  %s'%register)
+    print_instr('pop  %s'%register)
 
 # base statement
 def base_statement(stmt):
@@ -36,7 +42,7 @@ def base_statement(stmt):
             if type(stmt[2]) is tuple:
                 cal_func(stmt[2])
             else:
-                print("mov  eax,%s"%(stmt[1]))
+                print_instr("mov  eax,%s"%(stmt[1]))
             assign_value(stmt[1])
         if stmt[0] == 'for':
             loop_statement(stmt[1],stmt[2])
@@ -47,31 +53,31 @@ def base_statement(stmt):
             
 def compare_value(stmt1,stmt2):
     global count_IF
-    print(' cmp        %s,    %s'%(stmt1[1],stmt1[2]))
+    print_instr(' cmp        %s,    %s'%(stmt1[1],stmt1[2]))
     if stmt1[0] == '>':
-        print(' jg        else%d'%(count_IF))
+        print_instr(' jg        else%d'%(count_IF))
         ELSE_stmt.append(count_IF)
     elif stmt1[0] == '<':
-        print(' jl         else%d'%(count_IF))
+        print_instr(' jl         else%d'%(count_IF))
         ELSE_stmt.append(count_IF)
     elif stmt1[0] == '==':
-        print(' je         else%d'%(count_IF))
+        print_instr(' je         else%d'%(count_IF))
         ELSE_stmt.append(count_IF)
     elif stmt1[0] == '!=':
-        print(' jne        else%d'%(count_IF))
+        print_instr(' jne        else%d'%(count_IF))
         ELSE_stmt.append(count_IF)
     count_IF+=1
     base_statement(stmt2)
 
 def ELSE_statement(stmt):
-    print(' jmp      both%d'%(ELSE_stmt[len(ELSE_stmt)-1]))
-    print('else%s:'%(ELSE_stmt[len(ELSE_stmt)-1]))
+    print_instr(' jmp      both%d'%(ELSE_stmt[len(ELSE_stmt)-1]))
+    print_instr('else%s:'%(ELSE_stmt[len(ELSE_stmt)-1]))
     base_statement(stmt)
-    print('both%s:'%(ELSE_stmt[len(ELSE_stmt)-1]))
+    print_instr('both%s:'%(ELSE_stmt[len(ELSE_stmt)-1]))
     ELSE_stmt.pop(len(ELSE_stmt)-1)
 
 def assign_value(var_name):
-    print("mov  %s,eax"%var_name)
+    print_instr("mov  %s,eax"%var_name)
 
 def cal_func(stmt):
     if type(stmt[1]) is tuple and type(stmt[2]) is tuple:
@@ -79,42 +85,42 @@ def cal_func(stmt):
         push('eax')
         cal_func(stmt[2])
         if stmt[0] == '+':
-            print('pop   ebx')
-            print('add   eax,ebx')
+            print_instr('pop   ebx')
+            print_instr('add   eax,ebx')
         elif stmt[0] == '-':
-            print('pop   ebx')
-            print('sub   eax,ebx')
+            print_instr('pop   ebx')
+            print_instr('sub   eax,ebx')
         elif stmt[0] == '*':
-            print('pop   ebx')
-            print('mul   ebx')
+            print_instr('pop   ebx')
+            print_instr('mul   ebx')
         elif stmt[0] == '/':
-            print('pop   ecx')
-            print('div   ecx')  
-            print('mov  eax,edx')
+            print_instr('pop   ecx')
+            print_instr('div   ecx')  
+            print_instr('mov  eax,edx')
     elif type(stmt[1]) is tuple:
         cal_func(stmt[1])
         if stmt[0] == '+':
-            print('add  eax,%s'%stmt[2])
+            print_instr('add  eax,%s'%stmt[2])
         elif stmt[0] == '-':
-            print('sub  eax,%s'%stmt[2])
+            print_instr('sub  eax,%s'%stmt[2])
         elif stmt[0] == '*':
-            print('mov  ebx,%s'%stmt[2])
-            print('mul  ebx')
+            print_instr('mov  ebx,%s'%stmt[2])
+            print_instr('mul  ebx')
         elif stmt[0] == '/':
-            print('mov  ecx,%s'%stmt[2])
-            print('div  ecx')    
+            print_instr('mov  ecx,%s'%stmt[2])
+            print_instr('div  ecx')    
     elif type(stmt[2]) is tuple:
         cal_func(stmt[2])
         if stmt[0] == '+':
-            print('add  eax,%s'%stmt[1])
+            print_instr('add  eax,%s'%stmt[1])
         elif stmt[0] == '-':
-            print('sub  eax,%s'%stmt[1])
+            print_instr('sub  eax,%s'%stmt[1])
         elif stmt[0] == '*':
-            print('mov  ebx,%s'%stmt[1])
-            print('mul  ebx')
+            print_instr('mov  ebx,%s'%stmt[1])
+            print_instr('mul  ebx')
         elif stmt[0] == '/':
-            print('mov  ecx,%s'%stmt[2])
-            print('div  ecx')    
+            print_instr('mov  ecx,%s'%stmt[2])
+            print_instr('div  ecx')    
     elif stmt[0] == '+':
         add_func(stmt[1],stmt[2])
     elif stmt[0] == '-':
@@ -128,33 +134,33 @@ def add_func(first,second):
     if type(first) is str and check_var_not_duplicate(first):
         Error.append("Unidentified Variable")
         sys.exit(Error)
-    print('mov  eax,%s'%first)
-    print('add  eax,%s'%second)
+    print_instr('mov  eax,%s'%first)
+    print_instr('add  eax,%s'%second)
 
  
 def sub_func(first,second):
     if type(first) is str and check_var_not_duplicate(first):
         Error.append("Unidentified Variable")
         sys.exit(Error)    
-    print('mov  eax,%s'%first)
-    print('sub  eax,%s'%second)
+    print_instr('mov  eax,%s'%first)
+    print_instr('sub  eax,%s'%second)
 
 def mul_func(first,second):
     if type(first) is str and check_var_not_duplicate(first):
         Error.append("Unidentified Variable")
         sys.exit(Error)  
-    print('mov  eax,%s'%first)
-    print('mov  ebx,%s'%second)
-    print('mul  ebx')    
+    print_instr('mov  eax,%s'%first)
+    print_instr('mov  ebx,%s'%second)
+    print_instr('mul  ebx')    
     
 
 def div_func(first,second):
     if type(first) is str and check_var_not_duplicate(first):
         Error.append("Unidentified Variable")
         sys.exit(Error)
-    print('mov  eax,%s'%first)
-    print('mov  ecx,%s'%second)
-    print('div  ecx')    
+    print_instr('mov  eax,%s'%first)
+    print_instr('mov  ecx,%s'%second)
+    print_instr('div  ecx')    
 
 def recursion_statement(stmt1,stmt2):
     base_statement(stmt1)
@@ -170,21 +176,21 @@ def declar_var(stmt):
         val = stmt[2]
     if check_var_not_duplicate(var_name):
         var_list.append(var_name)
-        print(".data       %s     dd      %d"%(var_name,val))
+        data_list.append("       %s     dd      %d"%(var_name,val))
         #asm_data+= '''         '''+var_name+''':     dw      '''+str(val)+'''/n''' 
     else:
-        print("Failed Variable is Duplicate")
+        sys.exit("Failed Variable is Duplicate")
 
 def loop_statement(num, stmt):
     global count
     temp_count = count
     count += 1
-    print('mov	cx, '+ str(num))
-    print('for'+str(temp_count)+':')
-    print('push cx')
+    print_instr('mov	cx, '+ str(num))
+    print_instr('for'+str(temp_count)+':')
+    print_instr('push cx')
     base_statement(stmt)
-    print('pop cx')
-    print('loop for'+str(temp_count))
+    print_instr('pop cx')
+    print_instr('loop for'+str(temp_count))
 
 
 '''
@@ -200,4 +206,8 @@ while True:
 #print(asm_data)
 
 base_statement(result)
-print(Error)
+#print(Error)
+for ele in data_list:
+    print(ele)
+for ele in instr_list:
+    print(ele)
