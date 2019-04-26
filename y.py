@@ -12,13 +12,6 @@ import ply.yacc as yacc
  # Get the token map from the lexer.  This is required.
 from l import tokens
    
-class node:
-    def  __init__(self, op, left=None, right=None):
-        self.op = op
-        self.left = left
-        self.right = right
-
-
 precedence = (
         ('left', 'PLUS', 'MINUS'),
         ('left', 'TIMES', 'DIVIDE'),
@@ -66,6 +59,7 @@ def p_expression(p):
                | expression GT_OP expression
                | expression EQ_OP expression
                | expression NE_OP expression
+               | LPAREN expression RPAREN
     '''
     if p[2] == '+':
         p[0] = ('+',p[1],p[3])
@@ -85,6 +79,8 @@ def p_expression(p):
         p[0] = ('==',p[1],p[3])
     elif p[2] == '!=':
         p[0] = ('!=',p[1],p[3])
+    else:
+        p[0] = p[2]
     
 def p_init_declarator_notassign(p): 
     '''
@@ -159,34 +155,34 @@ def p_compound_empty_statement(p):
     '''
     compound_statement : LCB RCB
     '''
+    
 def p_compound_statement(p):
     '''
-    compound_statement : LCB statement_list RCB
-                       | LCB declaration_list RCB
-                       | LCB declaration_list statement_list RCB
+    compound_statement : LCB multi_statement RCB
+                       | LCB selection_statement RCB
     '''
     p[0] = p[2]
     
 def p_declaration_list_single(p): 
     '''
-    declaration_list : declaration
+    multi_statement : declaration
     '''
     p[0] = p[1]
 def p_declaration_list(p):
     '''
-    declaration_list : declaration_list declaration
+    multi_statement : multi_statement declaration
     '''
-    p[0] = (p[1],p[2])
+    p[0] = ('multi',p[1],p[2])
 def p_statement_list_single(p):
     '''
-    statement_list : statement
+    multi_statement : statement
     '''
     p[0] = p[1]
 def p_statement_list(p):
     '''
-    statement_list : statement_list statement
+    multi_statement : multi_statement statement
     '''
-    p[0] = (p[1],p[2])
+    p[0] = ('multi', p[1],p[2])
 def p_expresseion_close_statement(p):
     '''
     expression_statement : SEMICO
@@ -201,7 +197,7 @@ def p_selection_statement_else(p):
     '''
     selection_statement : IF LPAREN expression RPAREN statement ELSE statement
     '''
-    p[0] = ('if-else',p[3],p[5],p[7])
+    p[0] = ('multi',('if',p[3],p[5]),('else',p[7]))
 def p_selection_statement(p):
     '''
     selection_statement : IF LPAREN expression RPAREN statement
@@ -221,11 +217,11 @@ def p_jump_statement(p):
  # Error rule for syntax errors
 def p_error(p):
      print("Syntax error in input!")
-     
 
-        
- 
-        
+#loop count
+count = 0
+
+#------ joel
 # visit multiple statement     
 var_list = []
 asm_data = '''.data
@@ -237,47 +233,102 @@ def check_var_not_duplicate(var_name):
             #print("%s == %s"%(var_list[i],var_name))
             return False
     return True
+def push(register):
+    print('push  %s'%register)
+def pop(register):
+    print('pop  %s'%register)
 
 # base statement
 def base_statement(stmt):
-    if stmt[0] == 'multi':
-        recursion_statement(stmt[1],stmt[2])
-    if stmt[0] == 'declare-value':  
-        declar_var(stmt[1])
-    if stmt[0] == 'assign-value':  
-        if check_var_not_duplicate(stmt[1]):
-            return
-        if type(stmt[2]) is tuple:
-            cal_func(stmt[2])
-        else:
-            
-            print("mov  eax,%s"%(stmt[1]))
-        assign_value(stmt[1])
+    if stmt:
+        if stmt[0] == 'multi':
+            recursion_statement(stmt[1],stmt[2])
+        if stmt[0] == 'declare-value':  
+            declar_var(stmt[1])
+        if stmt[0] == 'assign-value':  
+            if check_var_not_duplicate(stmt[1]):
+                return
+            if type(stmt[2]) is tuple:
+                cal_func(stmt[2])
+            else:
+                print("mov  eax,%s"%(stmt[1]))
+            assign_value(stmt[1])
+        if stmt[0] == 'for':
+            loop_statement(stmt[1],stmt[2])
 
 def assign_value(var_name):
-    print("mov  eax,[%s]"%(var_name))
+    print("mov  %s,eax"%var_name)
 
 def cal_func(stmt):
-    if type(stmt[1]) is tuple:
+    if type(stmt[1]) is tuple and type(stmt[2]) is tuple:
+        cal_func(stmt[1])
+        push('eax')
+        cal_func(stmt[2])
+        if stmt[0] == '+':
+            print('pop   ebx')
+            print('add   eax,ebx')
+        elif stmt[0] == '-':
+            print('pop   ebx')
+            print('sub   eax,ebx')
+        elif stmt[0] == '*':
+            print('pop   ebx')
+            print('mul   ebx')
+        elif stmt[0] == '/':
+            print('pop   ecx')
+            print('div   ecx')  
+            print('mov  eax,edx')
+    elif type(stmt[1]) is tuple:
         cal_func(stmt[1])
         if stmt[0] == '+':
             print('add  eax,%s'%stmt[2])
         elif stmt[0] == '-':
             print('sub  eax,%s'%stmt[2])
+        elif stmt[0] == '*':
+            print('mov  ebx,%s'%stmt[2])
+            print('mul  ebx')
+        elif stmt[0] == '/':
+            print('mov  ecx,%s'%stmt[2])
+            print('div  ecx')    
+    elif type(stmt[2]) is tuple:
+        cal_func(stmt[2])
+        if stmt[0] == '+':
+            print('add  eax,%s'%stmt[1])
+        elif stmt[0] == '-':
+            print('sub  eax,%s'%stmt[1])
+        elif stmt[0] == '*':
+            print('mov  ebx,%s'%stmt[1])
+            print('mul  ebx')
+        elif stmt[0] == '/':
+            print('mov  ecx,%s'%stmt[2])
+            print('div  ecx')    
     elif stmt[0] == '+':
         add_func(stmt[1],stmt[2])
     elif stmt[0] == '-':
-        sub_func(stmt[1],stmt[2])    
+        sub_func(stmt[1],stmt[2]) 
+    elif stmt[0] == '*':
+        mul_func(stmt[1],stmt[2])
+    elif stmt[0] == '/':
+        div_func(stmt[1],stmt[2])       
 
 def add_func(first,second):
-    print('mov  %s,eax'%first)
+    print('mov  eax,%s'%first)
     print('add  eax,%s'%second)
+
  
-def minus_func(first,second):    
-    print('mov  %s,eax'%first)
+def sub_func(first,second):    
+    print('mov  eax,%s'%first)
     print('sub  eax,%s'%second)
 
+def mul_func(first,second):    
+    print('mov  eax,%s'%first)
+    print('mov  ebx,%s'%second)
+    print('mul  ebx')    
+    
 
+def div_func(first,second): 
+    print('mov  eax,%s'%first)
+    print('mov  ecx,%s'%second)
+    print('div  ecx')    
 
 def recursion_statement(stmt1,stmt2):
     base_statement(stmt1)
@@ -290,34 +341,31 @@ def declar_var(stmt):
         val = stmt[2]
     if check_var_not_duplicate(var_name):
         var_list.append(var_name)
-        print(".data       %s     dw      %d"%(var_name,val))
+        print(".data       %s     dd      %d"%(var_name,val))
         #asm_data+= '''         '''+var_name+''':     dw      '''+str(val)+'''/n''' 
     else:
         print("Failed Variable is Duplicate")
 
-  
-     
+def loop_statement(num, stmt):
+    global count
+    temp_count = count
+    count += 1
+    print('mov	cx, '+ str(num))
+    print('for'+str(temp_count)+':')
+    print('push cx')
+    base_statement(stmt)
+    print('pop cx')
+    print('loop for'+str(temp_count))
  
  # Build the parser
 parser = yacc.yacc()
 
 
-'''
-while True:
-    try:
-        s = input('calc > ')
-    except EOFError:
-        break
-    if not s: continue
-'''
-result = parser.parse('''int64 a=1;
-                      int64 b=5;
-                      int64 c=3;
-                      int64 d=7;
-                      int64 e=9;
-                      a= 5+7+6-7;
-                      b= 5+3-1-5-7;''')
-print(result)
-print(asm_data)
+result = parser.parse(''' int64 a= 0;
+                          int64 b=0;
+                      if(a==b){a=1+1; }
+                      ''')
+#print(result)
+#print(asm_data)
 
-base_statement(result)
+#base_statement(result)

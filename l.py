@@ -79,9 +79,8 @@ lexer = lex.lex()
 
  
  # Test it out
-data = '''
-[a+b-{h*n}%t]
 
+data = '''
 
 '''
  
