@@ -212,7 +212,7 @@ def p_selection_statement_else(p):
     '''
     selection_statement : IF LPAREN expression RPAREN statement ELSE statement
     '''
-    p[0] = ('multi',('if',p[3],p[5]),('else',p[7]))
+    p[0] = ('multi',('if-else',p[3],p[5]),('else',p[7]))
 def p_selection_statement(p):
     '''
     selection_statement : IF LPAREN expression RPAREN statement
