@@ -197,7 +197,7 @@ def p_selection_statement_else(p):
     '''
     selection_statement : IF LPAREN expression RPAREN statement ELSE statement
     '''
-    p[0] = ('multi',('if',p[3],p[5]),('else',p[7]))
+    p[0] = ('multi',('if-else',p[3],p[5]),('else',p[7]))
 def p_selection_statement(p):
     '''
     selection_statement : IF LPAREN expression RPAREN statement
@@ -223,9 +223,34 @@ def p_error(p):
 parser = yacc.yacc()
 
 
-result = parser.parse(''' int64 a= 0;
-                          int64 b=0;
-                      if(a==b){a=1+1; if(a>b){} else{} }
+result = parser.parse('''
+						
+							int64 d=3;
+							if(d>2)
+							{
+								d=4+4;
+								if(d>4)
+								{
+									d=3+3;
+								}
+								else
+								{
+									d=3+2;
+									if(d>3)
+									{
+										d=2+2;
+									}
+									else
+									{
+										d=2+1;
+									}
+								}
+							}
+							else
+							{ 
+								d=4+3;
+							}
+						
                       ''')
 #print(result)
 #print(asm_data)
