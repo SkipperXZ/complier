@@ -139,7 +139,6 @@ def compare_value_if(stmt1,stmt2):
     elif stmt1[0] == '!=':
         print_instr(' je        nextInstr%d'%(count_IF))
         ELSE_stmt.append(count_IF)
-    temp_count_IF = count_IF
     count_IF+=1
     base_statement(stmt2)
     print_instr('nextInstr%s:'%(ELSE_stmt[len(ELSE_stmt)-1]))
@@ -194,9 +193,11 @@ def cal_func(stmt):
             print_instr('pop   ebx')
             print_instr('mul   ebx')
         elif stmt[0] == '/':
+            print_instr('mov  edx, 0')
             print_instr('pop   ecx')
             print_instr('div   ecx')  
         elif stmt[0] == '%':
+            print_instr('mov  edx, 0')
             print_instr('pop   ecx')
             print_instr('div   ecx')  
             print_instr('mov  eax,edx')
@@ -210,9 +211,11 @@ def cal_func(stmt):
             print_instr('mov  ebx,%s'%stmt[2])
             print_instr('mul  ebx')
         elif stmt[0] == '/':
+            print_instr('mov  edx, 0')
             print_instr('mov  ecx,%s'%stmt[2])
             print_instr('div  ecx')  
         elif stmt[0] == '%':
+            print_instr('mov  edx, 0')
             print_instr('mov  ecx,%s'%stmt[2])
             print_instr('div  ecx')   
             print_instr('mov  eax,edx') 
@@ -241,7 +244,7 @@ def cal_func(stmt):
     elif stmt[0] == '/':
         div_func(stmt[1],stmt[2])
     elif stmt[0] == '%':
-        div_func(stmt[1],stmt[2])          
+        mod_func(stmt[1],stmt[2])          
 
 def add_func(first,second):
     if (type(first) is str and check_var_not_duplicate(first)) or (type(second) is str and check_var_not_duplicate(second)):
@@ -271,6 +274,7 @@ def div_func(first,second):
     if (type(first) is str and check_var_not_duplicate(first)) or (type(second) is str and check_var_not_duplicate(second)):
         Error.append("Unidentified Variable")
         sys.exit(Error)
+    print_instr('mov  edx, 0')
     print_instr('mov  eax,%s'%first)
     print_instr('mov  ecx,%s'%second)
     print_instr('div  ecx')    
@@ -279,6 +283,7 @@ def mod_func(first,second):
     if (type(first) is str and check_var_not_duplicate(first)) or (type(second) is str and check_var_not_duplicate(second)):
         Error.append("Unidentified Variable")
         sys.exit(Error)
+    print_instr('mov  edx, 0')
     print_instr('mov  eax,%s'%first)
     print_instr('mov  ecx,%s'%second)
     print_instr('div  ecx')    
