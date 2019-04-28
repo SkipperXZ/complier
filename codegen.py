@@ -8,21 +8,22 @@ index = 0
 ELSE_stmt = []
 
 # visit multiple statement  
-instr_list = []  
-data_list = ['.data'] 
+instr_list = ['main:']  
+data_list = ['.data\n',"msg db \"$\""] 
 var_list = []
 array_var_list = []
 Error = []
-asm_data = '''.data
 
-            '''
+    
             
 def print_instr(instr):
-    
-    for i in var_list:
-        splited_1 = i.split('[')
-        splited_2 = splited_1[1].split(']')
-        instr = instr.replace(i, splited_1[0]+'['+ str(int(splited_2[0])*4) +']'+splited_2[1])
+    if '[' not in instr:
+        pass
+    else:
+        for i in var_list:
+            splited_1 = i.split('[')
+            splited_2 = splited_1[1].split(']')
+            instr = instr.replace(i, splited_1[0]+'['+ str(int(splited_2[0])*4) +']'+splited_2[1])
     instr_list.append(instr)        
             
 def check_var_not_duplicate(var_name):
@@ -71,7 +72,32 @@ def base_statement(stmt):
             else_statement(stmt[1])
         if stmt[0] == 'if':
             compare_value_if(stmt[1],stmt[2])
+        if stmt[0] == 'display-var':
+            display_var(stmt[1])
+        if stmt[0] == 'display-string':
+            display_str(stmt[1])
             
+def display_str(str): 
+    print_instr("mov msg,%s"%str)
+    print_instr("mov edx,offset msg")
+    print_instr("call printstr")
+        
+def display_var(var_name):
+    
+    if not check_var_not_duplicate(var_name):
+        print_instr("push eax")
+        print_instr("push ebx")
+        print_instr("push ecx")
+        print_instr("push edx")
+        print_instr("mov   eax,%s"%var_name)
+        print_instr("call printvar")
+        print_instr("pop edx")
+        print_instr("pop ecx")
+        print_instr("pop ebx")
+        print_instr("pop eax")
+        
+    else:
+        sys.exit('Unidentified Variable')
 def recur_assign_array(stmt):
     if type(stmt[0]) is tuple:
         recur_assign_array(stmt[0])
@@ -334,7 +360,46 @@ while True:
 
 base_statement(result)
 #print(Error)
+print('''
+      .model tiny
+      .386
+      ''')
 for ele in data_list:
     print(ele)
+print('''
+      .code
+      org 100h
+''')
 for ele in instr_list:
     print(ele)
+print('''jmp finish
+      printvar:
+	mov bx,0
+	jmp digit
+
+digit:
+	mov edx,0
+	mov ecx,10
+	div ecx
+	inc bx
+	push edx
+
+	cmp eax,0
+	jg digit
+	mov cx,bx
+	jmp print
+print: 
+	pop edx
+	add edx,48
+	mov  ah, 02h    
+	int 21h
+	loop print	
+	ret
+printstr: 
+	mov  ah, 02h    
+	int 21h
+	ret
+finish:
+    ret
+end main''')
+

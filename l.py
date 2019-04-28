@@ -3,8 +3,8 @@ import ply.lex as lex
  # List of token names.   This is always required
 tokens = (
     'INT64','ARRAY',
-    'NAME','NUMBER',
-	'IF','ELSE','BREAK','FOR',
+    'NAME','NUMBER','STRING',
+	'IF','ELSE','BREAK','FOR','DISPLAY',
     'EQUALS', 'PLUS', 'MINUS', 'TIMES', 'DIVIDE','MOD',
 	'COMMA','SEMICO',
 	'LPAREN','RPAREN','LCB','RCB','LBK','RBK',
@@ -17,7 +17,8 @@ RESERVED = {
 	"break": "BREAK",
     "return": "RETURN",
 	"for": "FOR",
-    "array": "ARRAY"
+    "array": "ARRAY",
+    "display":"DISPLAY"
 }
  # Regular expression rules for simple tokens
 t_INT64    = r"int64"
@@ -26,6 +27,8 @@ t_ELSE = r"else"
 t_BREAK = r"break"
 t_FOR = r"for"
 t_ARRAY = r"array"
+t_DISPLAY = r"display"
+t_STRING = r'\"[a-zA-Z0-9]*\"'
 #t_CONST = r'\d+'
 t_EQUALS = r'='
 t_PLUS = r'\+'
@@ -63,7 +66,6 @@ def t_NAME(t):
      r'[a-zA-Z_][a-zA-Z0-9_]*'
      t.type = RESERVED.get(t.value, "NAME")
      return t
- 
  # A string containing ignored characters (spaces and tabs)
 t_ignore  = ' \t'
  # Error handling rule

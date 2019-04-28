@@ -163,9 +163,22 @@ def p_statement(p):
               | iteration_statement
               | jump_statement
               | compound_statement
+              | display_statement
     '''
     p[0] = p[1]
     
+def p_display_statement_str(p):
+    '''
+    display_statement : DISPLAY LPAREN STRING RPAREN SEMICO
+    '''
+    
+    p[0] = ('display-string',p[3])
+def p_display_statement_var(p):
+    '''
+    display_statement : DISPLAY LPAREN NAME RPAREN SEMICO
+    '''
+    
+    p[0] = ('display-var',p[3])
 def p_compound_empty_statement(p):
     '''
     compound_statement : LCB RCB
@@ -238,9 +251,8 @@ def p_error(p):
 parser = yacc.yacc()
 
 
-result = parser.parse(''' array [3] a = [1,2,3];  
-                      
-                          a[0] = a[1]+6-a[1]%3;
+result = parser.parse('''
+                      display("test");
                       ''')
 #print(result)
 #print(asm_data)
