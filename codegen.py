@@ -152,7 +152,8 @@ def assign_array(name,stmt):
 def compare_value_if(stmt1,stmt2):
     global count_IF
     print_instr(' mov        eax,  %s'%(stmt1[1]))
-    print_instr(' cmp        %s,    %s'%(stmt1[1],stmt1[2]))
+    print_instr(' mov        ebx,  %s'%(stmt1[2]))
+    print_instr(' cmp        eax,    ebx')
     if stmt1[0] == '>':
         print_instr(' jle        nextInstr%d'%(count_IF))
         ELSE_stmt.append(count_IF)
@@ -173,7 +174,8 @@ def compare_value_if(stmt1,stmt2):
 def compare_value_ifelse(stmt1,stmt2):
     global count_IF
     print_instr(' mov        eax,  %s'%(stmt1[1]))
-    print_instr(' cmp        %s,    %s'%(stmt1[1],stmt1[2]))
+    print_instr(' mov        ebx,  %s'%(stmt1[2]))
+    print_instr(' cmp        eax,    ebx')
     if stmt1[0] == '>':
         print_instr(' jle         else%d'%(count_IF))
         ELSE_stmt.append(count_IF)
