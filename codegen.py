@@ -27,11 +27,59 @@ def print_instr(instr):
                 splited_2 = splited_1[1].split(']')
                 tempinstr = tempinstr.replace(i, splited_1[0]+'['+ str(int(splited_2[0])*4) +']'+splited_2[1])
         instr = tempinstr
+    instr_list.append(instr)    
 
+def print_cll_module_instr():
 
-            
+    print('''jmp finish
+        printvar:
+            mov bx,0
+            jmp digit
 
-    instr_list.append(instr)      
+        digit:
+            mov edx,0
+            mov ecx,10
+            div ecx
+            inc bx
+            push edx
+
+            cmp eax,0
+            jg digit
+            mov cx,bx
+            jmp print
+        print: 
+            pop edx
+            add edx,48
+            mov  ah, 02h    
+            int 21h
+            loop print	
+            ret
+        printstr: 
+            mov  ah, 02h    
+            int 21h
+            ret
+        finish:
+            ret
+        end main''')
+
+def print_header():
+    print('''
+      .model tiny
+      .386
+      ''')
+    for ele in data_list:
+        print(ele)
+    print('''
+        .code
+        org 100h
+    ''')
+    
+def print_all_instr():
+
+    for ele in instr_list:
+        print(ele)        
+
+      
 
 def print_instr_without_check_array(instr):  
     instr_list.append(instr)   
@@ -57,12 +105,10 @@ def base_statement(stmt):
             declar_var(stmt[1])
         if stmt[0] == 'assign-value':  
             if type(stmt[1]) is str and check_var_not_duplicate(stmt[1]):
-                Error.append("Unidentified Variable")
-                sys.exit(Error)
+                sys.exit("Unidentified Variable")
             elif (type(stmt[1]) is str  and type(stmt[2]) is int) or (type(stmt[1]) is str  and type(stmt[2]) is str):
                 if check_var_not_duplicate(stmt[1]) or check_var_not_duplicate(stmt[2]):
-                    Error.append("Unidentified Variable")
-                    sys.exit(Error)
+                    sys.exit("Unidentified Variable")
                 print_instr("mov    %s,%s"%(stmt[1],stmt[2]))
                 return
             elif type(stmt[2]) is tuple:
@@ -240,8 +286,7 @@ def else_statement(stmt):
 
 def assign_value(var_name):
     if check_var_not_duplicate(var_name):
-        Error.append("Unidentified Variable")
-        sys.exit(Error)
+        sys.exit("Unidentified Variable")
     
     print_instr("mov  %s,eax"%var_name)
 
@@ -323,15 +368,13 @@ def add_func(first,second):
  
 def sub_func(first,second):
     if (type(first) is str and check_var_not_duplicate(first)) or (type(second) is str and check_var_not_duplicate(second)):
-        Error.append("Unidentified Variable")
-        sys.exit(Error)    
+        sys.exit("Unidentified Variable")    
     print_instr('mov  eax,%s'%first)
     print_instr('sub  eax,%s'%second)
 
 def mul_func(first,second):
     if (type(first) is str and check_var_not_duplicate(first)) or (type(second) is str and check_var_not_duplicate(second)):
-        Error.append("Unidentified Variable")
-        sys.exit(Error)  
+        sys.exit("Unidentified Variable")  
     print_instr('mov  eax,%s'%first)
     print_instr('mov  ebx,%s'%second)
     print_instr('mul  ebx')    
@@ -339,8 +382,7 @@ def mul_func(first,second):
 
 def div_func(first,second):
     if (type(first) is str and check_var_not_duplicate(first)) or (type(second) is str and check_var_not_duplicate(second)):
-        Error.append("Unidentified Variable")
-        sys.exit(Error)
+        sys.exit("Unidentified Variable")
     print_instr('mov  edx, 0')
     print_instr('mov  eax,%s'%first)
     print_instr('mov  ecx,%s'%second)
@@ -348,8 +390,7 @@ def div_func(first,second):
  
 def mod_func(first,second):
     if (type(first) is str and check_var_not_duplicate(first)) or (type(second) is str and check_var_not_duplicate(second)):
-        Error.append("Unidentified Variable")
-        sys.exit(Error)
+        sys.exit("Unidentified Variable")
     print_instr('mov  edx, 0')
     print_instr('mov  eax,%s'%first)
     print_instr('mov  ecx,%s'%second)
@@ -401,48 +442,12 @@ while True:
 
 base_statement(result)
 #print(Error)
-print('''
-      .model tiny
-      .386
-      ''')
-for ele in data_list:
-    print(ele)
-print('''
-      .code
-      org 100h
-''')
-for ele in instr_list:
-    print(ele)
-print('''jmp finish
-      printvar:
-	mov bx,0
-	jmp digit
 
-digit:
-	mov edx,0
-	mov ecx,10
-	div ecx
-	inc bx
-	push edx
+print_header()
+print_all_instr()
+print_cll_module_instr()
 
-	cmp eax,0
-	jg digit
-	mov cx,bx
-	jmp print
-print: 
-	pop edx
-	add edx,48
-	mov  ah, 02h    
-	int 21h
-	loop print	
-	ret
-printstr: 
-	mov  ah, 02h    
-	int 21h
-	ret
-finish:
-    ret
-end main''')
+
 
 
 
