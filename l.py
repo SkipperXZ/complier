@@ -83,8 +83,8 @@ lexer = lex.lex()
  # Test it out
 
 data = '''
-
-'''
+                       
+                      '''
  
  # Give the lexer some input
 lexer.input(data)

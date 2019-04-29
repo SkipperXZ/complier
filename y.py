@@ -98,6 +98,7 @@ def p_init_declarator_array(p):
     init_declarator : declarator LBK NUMBER RBK EQUALS expression
     '''
     p[0] = ('assign-value', p[1]+p[2]+str(p[3])+p[4], p[6])
+
 def p_init_declarator(p):
     '''
     init_declarator : declarator EQUALS expression
@@ -131,6 +132,9 @@ def p_array_as_name(p):
     declarator : NAME LBK NUMBER RBK
     '''
     p[0] = p[1]+p[2]+str(p[3])+p[4]
+
+
+
 def p_declarator(p):
     '''
     declarator : NAME
@@ -171,11 +175,18 @@ def p_display_statement_str(p):
     '''
     display_statement : DISPLAY LPAREN STRING RPAREN SEMICO
     '''
+
+def p_display_statement_array(p):
+    '''
+    display_statement : DISPLAY LPAREN NAME LBK NUMBER RBK RPAREN SEMICO
+                      | DISPLAY LPAREN NAME LBK NAME RBK RPAREN SEMICO
+    '''
     
-    p[0] = ('display-string',p[3])
+    p[0] = ('display-array',p[3],p[5])
 def p_display_statement_var(p):
     '''
     display_statement : DISPLAY LPAREN NAME RPAREN SEMICO
+                      
     '''
     
     p[0] = ('display-var',p[3])
@@ -252,9 +263,37 @@ parser = yacc.yacc()
 
 
 result = parser.parse('''
-                      display("test");
+                      int64 temp =0;
+                      int64 i =0;
+                      int64 max = 0;
+                      array [10] arr = [11,32,43,54,65,65,10,101,1,55];
+                      for(10){
+                          temp = arr[1];
+                         if(max>temp){
+                              max = i;
+                          }
+                          display(max);
+                          i = i+1;
+                        }
                       ''')
-#print(result)
+
+
+
+'''
+   int64 temp =0;
+                      int64 i =0;
+                      int64 max = 0;
+                      array [10] arr = [11,32,43,54,65,65,10,101,1,55];
+                      for(10){
+
+                          temp = arr[1]+0 ;
+                         if(b>temp){
+                              max = i;
+                          }
+                          display(max);
+                          i = i+1;
+'''
+print(result)
 #print(asm_data)
 
 #base_statement(result)
