@@ -15,6 +15,7 @@ instr_list = []
 data_list = ['hexformat: dq "%llx",10,0','decformat: dq "%lld",10,0'] 
 var_list = []
 array_var_list = []
+array_list = []
 Error = []
 
 def convert_var(t):
@@ -258,6 +259,7 @@ def declar_array(size,stmt):
     #if stmt[0] == 'assign-array':
     recur_assign_array(stmt[1])
     temp_str = '%s dd '%stmt[0]
+    array_list.append(stmt[0])
     temp_ele = ''
     if not check_var_not_duplicate('%s[%s]'%(stmt[0],index)):
         sys.exit('variable duplicate')
@@ -267,7 +269,7 @@ def declar_array(size,stmt):
         if array_var_list[len(array_var_list)-1] != ele:
             temp_ele += ' , '
         if check_var_not_duplicate('%s[%s]'%(stmt[0],index)):
-            var_list.append('%s[%s]'%(stmt[0],index))
+           # var_list.append('%s[%s]'%(stmt[0],index))
             index += 1
     data_list.append(temp_str + temp_ele)
     array_var_list.clear()
