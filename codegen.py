@@ -12,7 +12,7 @@ ELSE_stmt = []
 
 # visit multiple statement  
 instr_list = []  
-data_list = ['hexformat: dq "%llx",10,0','decformat: dq "%lld",10,0'] 
+data_list = ['hexformat: dq "%llx",10,0','decformat: dq "%lld",10,0','newLineMsg dq 0xA, 0xD'] 
 var_list = []
 array_var_list = []
 array_list = []
@@ -306,6 +306,8 @@ def display_str(string):
     print_instr("push rdx")
 
     print_instr("mov rcx, tempstr"+str(count))     
+    print_instr("call printf")
+    print_instr("mov rcx, newLineMsg")
     print_instr("call printf")
     print_instr("add rsp, 40 ")
 
