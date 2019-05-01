@@ -22,3 +22,5 @@ asm/a.asm
 *.COM
 a.asm
 a.exe
+asm/run.bat
+y.py

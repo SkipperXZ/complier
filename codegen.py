@@ -25,9 +25,12 @@ def convert_var(t):
     else:
         return '['+str(t)+']'
 
-def is_array(str):
-    if '[' in str:
-        return True
+def is_array(str1):
+    if not type(str1) is int :
+        if '[' in str1:
+            return True
+        else:
+            return False
     else:
         return False
 
@@ -114,7 +117,6 @@ def base_statement(stmt):
         if stmt[0] == 'multi':
             recursion_statement(stmt[1],stmt[2])
         if stmt[0] == 'declare-value':  
-
             declar_var(stmt[1])
         if stmt[0] == 'assign-value':
             assign_func(stmt)
@@ -151,35 +153,18 @@ def assign_func(stmt):
 
     if  type(stmt[2]) is int:
         print_instr("mov    %s,%s"%(convert_var(stmt[1]),convert_var(stmt[2])))
-        #print_instr("mov    %s,%s"%(convert_var(stmt[1]),convert_var(stmt[2])))
     elif type(stmt[2]) is str:
-      
         
         if is_array(stmt[2]):
-            
-            var = spilt_array_name(stmt[2])
-            name = var[0]
-            index =var[1]
-            print_instr("push    rax")
-            mul_func(index,8)
-            print_instr("mov    rsi,rax")  
-            print_instr("pop    rax")
-            print_instr("mov    rax,[%s+rsi]"%name)    
+            mov_array_to_rax(stmt[2])
         else:
             print_instr("mov    rax,%s"%convert_var(stmt[2])) 
         
     elif type(stmt[2]) is tuple:
         cal_func(stmt[2])
     if is_array(stmt[1]):
-        var = spilt_array_name(stmt[1])
-        name = var[0]
-        index = var[1]
-        print(convert_var(index))
-        print_instr("push    rax")
-        mul_func(index,8)
-        print_instr("mov    rsi,rax")  
-        print_instr("pop    rax")
-        print_instr("mov    [%s+rsi],rax"%name)  
+        
+        mov_rax_to_array(stmt[1])
 
     else:
         print_instr("mov  %s,rax"%convert_var(stmt[1]))
@@ -221,37 +206,91 @@ def cal_func(stmt):
     elif type(stmt[1]) is tuple:
         cal_func(stmt[1])
         if stmt[0] == '+':
-            print_instr('add  rax,%s'%stmt[2])
+            if is_array(stmt[2]):
+                cal_index_esi(stmt[2])
+                print_instr('add  rax,[%s+rsi]'%spilt_array_name(stmt[2])[0])
+            else:
+                print_instr('add  rax,%s'%convert_var(stmt[2]))
         elif stmt[0] == '-':
-            print_instr('sub  rax,%s'%stmt[2])
+            if is_array(stmt[2]):
+                cal_index_esi(stmt[2])
+                print_instr('sub  rax,[%s+rsi]'%spilt_array_name(stmt[2])[0])
+            else:
+                print_instr('sub  rax,%s'%convert_var(stmt[2]))
         elif stmt[0] == '*':
-            print_instr('mov  rbx,%s'%stmt[2])
-            print_instr('mul  rbx')
+            if is_array(stmt[2]):
+                cal_index_esi(stmt[2])
+                print_instr('mov  rbx,[%s+rsi]'%spilt_array_name(stmt[2])[0])
+                print_instr('mul  rbx')
+            else:
+                print_instr('mov  rbx,%s'%convert_var(stmt[2]))
+                print_instr('mul  rbx')
         elif stmt[0] == '/':
-            print_instr('mov  rdx, 0')
-            print_instr('mov  rcx,%s'%stmt[2])
-            print_instr('div  rcx')  
+            if is_array(stmt[2]):
+                cal_index_esi(stmt[2])
+                print_instr('mov  rdx, 0')
+                print_instr('mov  rcx,[%s+rsi]'%spilt_array_name(stmt[2])[0])
+                print_instr('div  rcx')  
+            else:
+                print_instr('mov  rdx, 0')
+                print_instr('mov  rcx,%s'%convert_var(stmt[2]))
+                print_instr('div  rcx')  
         elif stmt[0] == '%':
-            print_instr('mov  rdx, 0')
-            print_instr('mov  rcx,%s'%stmt[2])
-            print_instr('div  rcx')   
-            print_instr('mov  rax,rdx') 
+            if is_array(stmt[2]):
+                cal_index_esi(stmt[2])
+                print_instr('mov  rdx, 0')
+                print_instr('mov  rcx,[%s+rsi]'%spilt_array_name(stmt[2])[0])
+                print_instr('div  rcx')   
+                print_instr('mov  rax,rdx') 
+            else:
+                print_instr('mov  rdx, 0')
+                print_instr('mov  rcx,%s'%convert_var(stmt[2]))
+                print_instr('div  rcx')   
+                print_instr('mov  rax,rdx') 
     elif type(stmt[2]) is tuple:
         cal_func(stmt[2])
         if stmt[0] == '+':
-            print_instr('add  rax,%s'%stmt[1])
+            if is_array(stmt[1]):
+                cal_index_esi(stmt[1])
+                print_instr('add  rax,[%s+rsi]'%spilt_array_name(stmt[1])[0])
+            else:
+                print_instr('add  rax,%s'%convert_var(stmt[1]))
         elif stmt[0] == '-':
-            print_instr('sub  rax,%s'%stmt[1])
+            if is_array(stmt[1]):
+                cal_index_esi(stmt[1])
+                print_instr('sub  rax,[%s+rsi]'%spilt_array_name(stmt[1])[0])
+            else:
+                print_instr('sub  rax,%s'%convert_var(stmt[1]))
         elif stmt[0] == '*':
-            print_instr('mov  rbx,%s'%stmt[1])
-            print_instr('mul  rbx')
+            if is_array(stmt[1]):
+                cal_index_esi(stmt[1])
+                print_instr('mov  rbx,[%s+rsi]'%spilt_array_name(stmt[1])[0])
+                print_instr('mul  rbx')
+            else:
+                print_instr('mov  rbx,%s'%convert_var(stmt[1]))
+                print_instr('mul  rbx')
         elif stmt[0] == '/':
-            print_instr('mov  rcx,%s'%stmt[1])
-            print_instr('div  rcx')
+            if is_array(stmt[1]):
+                cal_index_esi(stmt[1])
+                print_instr('mov  rdx, 0')
+                print_instr('mov  rcx,[%s+rsi]'%spilt_array_name(stmt[1])[0])
+                print_instr('div  rcx')  
+            else:
+                print_instr('mov  rdx, 0')
+                print_instr('mov  rcx,%s'%convert_var(stmt[1]))
+                print_instr('div  rcx')  
         elif stmt[0] == '%':
-            print_instr('mov  rcx,%s'%stmt[1])
-            print_instr('div  rcx')     
-            print_instr('mov  rax,rdx') 
+            if is_array(stmt[1]):
+                cal_index_esi(stmt[1])
+                print_instr('mov  rdx, 0')
+                print_instr('mov  rcx,[%s+rsi]'%spilt_array_name(stmt[1])[0])
+                print_instr('div  rcx')   
+                print_instr('mov  rax,rdx') 
+            else:
+                print_instr('mov  rdx, 0')
+                print_instr('mov  rcx,%s'%convert_var(stmt[1]))
+                print_instr('div  rcx')   
+                print_instr('mov  rax,rdx')  
             
     elif stmt[0] == '+':
         add_func(stmt[1],stmt[2])
@@ -265,34 +304,119 @@ def cal_func(stmt):
         mod_func(stmt[1],stmt[2])          
 
 def add_func(first,second):
-    print_instr('mov  rax,%s'%convert_var(first))
-    print_instr('add  rax,%s'%convert_var(second))
+    if is_array(first) and is_array(second):
+        mov_array_to_rax(first)
+        cal_index_esi(second)
+        print_instr('add  rax,[%s+rsi]'%spilt_array_name(second)[0])
+    elif is_array(first):
+        mov_array_to_rax(first)
+        print_instr('add  rax,%s'%convert_var(second))
+    elif is_array(second):
+        print_instr('mov  rax,%s'%convert_var(first))
+        cal_index_esi(second)
+        print_instr('add  rax,[%s+rsi]'%spilt_array_name(second)[0])
+    else:
+        print_instr('mov  rax,%s'%convert_var(first))
+        print_instr('add  rax,%s'%convert_var(second))
 
  
 def sub_func(first,second):
-    print_instr('mov  rax,%s'%convert_var(first))
-    print_instr('sub  rax,%s'%convert_var(second))
+    if is_array(first) and is_array(second):
+        mov_array_to_rax(first)
+        cal_index_esi(second)
+        print_instr('sub  rax,[%s+rsi]'%spilt_array_name(second)[0])
+    elif is_array(first):
+        mov_array_to_rax(first)
+        print_instr('sub  rax,%s'%convert_var(second))
+    elif is_array(second):
+        print_instr('mov  rax,%s'%convert_var(first))
+        cal_index_esi(second)
+        print_instr('sub  rax,[%s+rsi]'%spilt_array_name(second)[0])
+    else:
+        print_instr('mov  rax,%s'%convert_var(first))
+        print_instr('sub  rax,%s'%convert_var(second))
 
 def mul_func(first,second):
-    print_instr('mov  rax,%s'%convert_var(first))
-    print_instr('mov  rbx,%s'%convert_var(second))
-    print_instr('mul  rbx')    
-    
+    if is_array(first) and is_array(second):
+        mov_array_to_rax(first)
+        cal_index_esi(second)
+        print_instr('mov  rbx,[%s+rsi]'%spilt_array_name(second)[0])
+        print_instr('mul  rbx')
+    elif is_array(first):
+        mov_array_to_rax(first)
+        print_instr('mov  rbx,%s'%convert_var(second))
+        print_instr('mul  rbx') 
+    elif is_array(second):
+        print_instr('mov  rax,%s'%convert_var(first))
+        cal_index_esi(second)
+        print_instr('mov  rbx,[%s+rsi]'%spilt_array_name(second)[0])
+        print_instr('mul  rbx') 
+    else:
+        print_instr('mov  rax,%s'%convert_var(first))
+        print_instr('mov  rbx,%s'%convert_var(second))
+        print_instr('mul  rbx')    
+        
 
 def div_func(first,second):
     print_instr('mov  rdx, 0')
-    print_instr('mov  rax,%s'%convert_var(first))
-    print_instr('mov  rcx,%s'%convert_var(second))
-    print_instr('div  rcx')    
+    if is_array(first) and is_array(second):
+        mov_array_to_rax(first)
+        cal_index_esi(second)
+        print_instr('mov  rcx,[%s+rsi]'%spilt_array_name(second)[0])
+        print_instr('div  rcx')  
+    elif is_array(first):
+        mov_array_to_rax(first)
+        print_instr('mov  rcx,%s'%convert_var(second))
+        print_instr('div  rcx')  
+    elif is_array(second):
+        print_instr('mov  rax,%s'%convert_var(first))
+        cal_index_esi(second)
+        print_instr('mov  rcx,[%s+rsi]'%spilt_array_name(second)[0])
+        print_instr('div  rcx')  
+    else:
+        print_instr('mov  rax,%s'%convert_var(first))
+        print_instr('mov  rcx,%s'%convert_var(second))
+        print_instr('div  rcx')    
  
 def mod_func(first,second):
     print_instr('mov  rdx, 0')
-    print_instr('mov  rax,%s'%convert_var(first))
-    print_instr('mov  rcx,%s'%convert_var(second))
-    print_instr('div  rcx')    
+    if is_array(first) and is_array(second):
+        mov_array_to_rax(first)
+        cal_index_esi(second)
+        print_instr('mov  rcx,[%s+rsi]'%spilt_array_name(second)[0])
+        print_instr('div  rcx')  
+    elif is_array(first):
+        mov_array_to_rax(first)
+        print_instr('mov  rcx,%s'%convert_var(second))
+        print_instr('div  rcx')  
+    elif is_array(second):
+        print_instr('mov  rax,%s'%convert_var(first))
+        cal_index_esi(second)
+        print_instr('mov  rcx,[%s+rsi]'%spilt_array_name(second)[0])
+        print_instr('div  rcx')  
+    else:
+        print_instr('mov  rax,%s'%convert_var(first))
+        print_instr('mov  rcx,%s'%convert_var(second))
+        print_instr('div  rcx')   
     print_instr('mov  rax,rdx')  
 
+def mov_array_to_rax(array):
+    cal_index_esi(array)
+    print_instr("mov    rax,[%s+rsi]"%spilt_array_name(array)[0])    
 
+def mov_rax_to_array(array):    
+    cal_index_esi(array) 
+    print_instr("pop    rax")
+    print_instr("mov    [%s+rsi],rax"%spilt_array_name(array)[0])  
+
+def cal_index_esi(array):
+    print_instr('push rax')
+    var = spilt_array_name(array)
+    name = var[0]
+    index =var[1]
+    mul_func(index,8)
+    print_instr("mov    rsi,rax")  
+    print_instr('pop rax')
 
 def display_array(arr_name,arr_index):
     if(type(arr_index) is int):
