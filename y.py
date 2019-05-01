@@ -40,11 +40,18 @@ def p_signed_number(p):
     '''
     p[0] = -p[2]
     
-def p_expression_array(p):
+def p_expression_array_index_var(p):
     '''
     expression : NAME LBK NUMBER RBK
     '''
     p[0] = p[1]+p[2]+str(p[3])+p[4]
+
+def p_expression_array_index_const(p):
+    '''
+    expression : NAME LBK NAME RBK
+    '''
+    p[0] = p[1]+p[2]+str(p[3])+p[4]
+
 def p_expression_number(p):
     '''
       expression : signed_number
@@ -93,7 +100,7 @@ def p_init_declarator_notassign(p):
     '''
     p[0] = p[1]
     
-def p_init_declarator_array(p):
+def p_init_declarator_array_constant(p):
     '''
     init_declarator : declarator LBK NUMBER RBK EQUALS expression
     '''
@@ -130,6 +137,12 @@ def p_array_declaration(p):
 def p_array_as_name(p):
     '''
     declarator : NAME LBK NUMBER RBK
+    '''
+    p[0] = p[1]+p[2]+str(p[3])+p[4]
+
+def p_array_as_name_var_index(p):
+    '''
+    declarator : NAME LBK NAME RBK
     '''
     p[0] = p[1]+p[2]+str(p[3])+p[4]
 
@@ -263,35 +276,44 @@ parser = yacc.yacc()
 
 
 result = parser.parse('''
-                      int64 temp =0;
+                      
+                             int64 temp =0;
                       int64 i =0;
                       int64 max = 0;
                       array [10] arr = [11,32,43,54,65,65,10,101,1,55];
                       for(10){
-                          temp = arr[1];
-                         if(max>temp){
-                              max = i;
+
+                          temp = arr[i] ;
+                         if(max<temp){
+                              max = (1+arr[i])+(arr[i]+i);
                           }
-                          display(max);
+                          
                           i = i+1;
-                        }
+                          
+                              }
+                         display(max);
                       ''')
-
-
-
 '''
-   int64 temp =0;
-                      int64 i =0;
-                      int64 max = 0;
-                      array [10] arr = [11,32,43,54,65,65,10,101,1,55];
-                      for(10){
-
-                          temp = arr[1]+0 ;
-                         if(b>temp){
-                              max = i;
-                          }
-                          display(max);
-                          i = i+1;
+   int64 a =7;
+                      int64 b =4;
+                      int64 c = 9;
+                        if(a<b){
+                            if(a<c){
+                                display(a);
+                            }
+                            else{
+                                display(c);
+                            }
+                        }
+                        else{
+                            if(b<c){
+                                display(b);
+                            }
+                            else{
+                                display(c);
+                            }
+                            
+                        }
 '''
 print(result)
 #print(asm_data)
