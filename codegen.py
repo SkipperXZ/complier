@@ -8,8 +8,8 @@ index = 0
 ELSE_stmt = []
 
 # visit multiple statement  
-instr_list = ['main:']  
-data_list = ['.data\n',"msg db \"$\""] 
+instr_list = []  
+data_list = ["msg db \"$\""] 
 var_list = []
 array_var_list = []
 Error = []
@@ -73,18 +73,17 @@ def print_cll_module_instr():
             ret
         finish:
             ret
-        end main''')
+        ''')
 
 def print_header():
-    print('''
-      .model tiny
-      .386
-      ''')
+    print('        section .data')
     for ele in data_list:
         print(ele)
     print('''
-        .code
-        org 100h
+        global main
+            extern printf
+        section .text
+    main:
     ''')
 
 def print_all_instr():
@@ -526,11 +525,11 @@ def loop_statement(num, stmt):
     global count
     temp_count = count
     count += 1
-    print_instr('mov	cx, '+ str(num))
+    print_instr('mov	rcx, '+ str(num))
     print_instr('for'+str(temp_count)+':')
-    print_instr('push cx')
+    print_instr('push rcx')
     base_statement(stmt)
-    print_instr('pop cx')
+    print_instr('pop rcx')
     print_instr('loop for'+str(temp_count))
 
 
