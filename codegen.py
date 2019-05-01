@@ -12,7 +12,7 @@ ELSE_stmt = []
 
 # visit multiple statement  
 instr_list = []  
-data_list = ['hexformat: dq "%llx",10,0','decformat: dq "%lld",10,0'] 
+data_list = ['hexformat: dq "%llx",10,0','decformat: dq "%lld",10,0','newLineMsg dq 0xA, 0xD'] 
 var_list = []
 array_var_list = []
 array_list = []
@@ -318,11 +318,27 @@ def display_array(arr_name,arr_index):
         print_instr("pop rbx")
         print_instr("pop rax")
 
-def display_str(str): 
-    print_instr("mov msg,%s"%str)
-    print_instr("mov rdx,offset msg")
-    print_instr("call printstr")
+def display_str(string): 
+    global count
+
+    data_list.append('tempstr'+str(count)+': dq '+string+' ,10 ,0')
+    print_instr("push rax")
+    print_instr("push rbx")
+    print_instr("push rcx")
+    print_instr("push rdx")
+
+    print_instr("mov rcx, tempstr"+str(count))     
+    print_instr("call printf")
+    print_instr("mov rcx, newLineMsg")
+    print_instr("call printf")
+    print_instr("add rsp, 40 ")
+
+    print_instr("pop rdx")
+    print_instr("pop rcx")
+    print_instr("pop rbx")
+    print_instr("pop rax")
         
+    count += 1;
 def display_var(var_name):
     if is_define_var(var_name):
         print_instr("push rax")
@@ -355,7 +371,7 @@ def declar_array(size,stmt):
     if is_define_not_duplicate(stmt[0]):
         global index
         recur_assign_array(stmt[1])
-        temp_str = '%s dd '%stmt[0]
+        temp_str = '%s dq '%stmt[0]
         array_list.append(stmt[0])
         print(array_list)
         temp_ele = ''
@@ -450,6 +466,7 @@ print_header()
 print_all_instr()
 
 # close file
+f.write('ret')
 f.close()
 
 
