@@ -71,11 +71,16 @@ def print_all_instr():
 def print_instr_without_check_array(instr):  
     instr_list.append(instr)   
             
-def check_var_not_duplicate(var_name):
+def check_var_not_duplicate(var):
+    if '[' in var:
+        for i in range(len(array_var_list)):
+            if(array_var_list[i] == spilt_array_name(var)[0]):
+                return False
+
     for i in range(len(var_list)):
-        if(var_list[i] == var_name):
-            #print("%s == %s"%(var_list[i],var_name))
+        if(var_list[i] == var):
             return False
+    
     return True
 
 def push(register):
@@ -115,7 +120,6 @@ def base_statement(stmt):
 
 
 def assign_func(stmt):
-    
     print('[' in stmt[1] and is_var_index_array(stmt[1]))
     if '[' in stmt[1] and '[' in stmt[2]:
         if is_var_index_array(stmt[1]) and is_var_index_array(stmt[2]):
@@ -439,9 +443,6 @@ def cal_func(stmt):
     elif stmt[0] == '%':
         mod_func(stmt[1],stmt[2])          
 
-
-#def add_array_func():
-
 def add_func(first,second):
     if (type(first) is str and check_var_not_duplicate(first)) or (type(second) is str and check_var_not_duplicate(second)):
         Error.append("Unidentified Variable add")
@@ -496,7 +497,6 @@ def declar_var(stmt):
     if check_var_not_duplicate(var_name):
         var_list.append(var_name)
         data_list.append("       %s     dq      %d"%(var_name,val))
-        #asm_data+= '''         '''+var_name+''':     dw      '''+str(val)+'''/n''' 
     else:
         sys.exit("Failed Variable is Duplicate")
 
@@ -512,20 +512,9 @@ def loop_statement(num, stmt):
     print_instr('loop for'+str(temp_count))
 
 
-'''
-while True:
-    try:
-        s = input('calc > ')
-    except EOFError:
-        break
-    if not s: continue
-'''
 
-#print(result)
-#print(asm_data)
-
+print(result)
 base_statement(result)
-#print(Error)
 
 print_header()
 print_all_instr()
