@@ -302,7 +302,7 @@ def display_str(str):
     print_instr("call printstr")
         
 def display_var(var_name):
-    if not check_var_not_duplicate(var_name):
+    if is_define_var(var_name):
         print_instr("push rax")
         print_instr("push rbx")
         print_instr("push rcx")
@@ -319,8 +319,6 @@ def display_var(var_name):
         print_instr("pop rbx")
         print_instr("pop rax")
         
-    else:
-        sys.exit('Unidentified Variable display var')
 def recur_assign_array(stmt):
     if type(stmt[0]) is tuple:
         recur_assign_array(stmt[0])
