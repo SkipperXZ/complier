@@ -276,6 +276,9 @@ parser = yacc.yacc()
 
 
 result = parser.parse('''
+                            int64 a = 1;
+
+                            a= a+1+2*3;
                       ''')
 '''
                  int64 temp =0;
