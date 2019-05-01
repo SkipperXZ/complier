@@ -1,6 +1,9 @@
 from y import result
 import sys
 
+# write file
+f = open('D:/Assembly/a.asm', 'w+')
+
 #loop count
 count = 0
 count_IF = 1
@@ -43,45 +46,28 @@ def print_instr(instr):
     instr_list.append(instr)    
 
 def print_cll_module_instr():
-
-    print('''jmp finish
-        printvar:
-            mov bx,0
-            jmp digit
-
-        digit:
-            mov edx,0
-            mov ecx,10
-            div ecx
-            inc bx
-            push edx
-
-            cmp eax,0
-            jg digit
-            mov cx,bx
-            jmp print
-        print: 
-            pop edx
-            add edx,48
-            mov  ah, 02h    
-            int 21h
-            loop print	
-            ret
-        printstr: 
-            mov  ah, 02h    
-            int 21h
-            ret
-        finish:
-            ret
-        ''')
+    f.write('''
+            mov rax, [a]
+    add rax, 1
+    mov [a], rax
+	mov	rcx, 3
+l:
+	push	rcx
+	sub     rsp, 20h                        ; Reserve the shadow space
+    mov     rcx, a				            ; First argument is address of message
+    call    printf                          ; puts(message)
+    add     rsp, 20h                        ; Remove shadow space
+	pop	    rcx
+	loop    l
+    ret
+    ''')
 
 def print_header():
-    print('''
-    section .data
+    f.write('''    section .data
       ''')
     for ele in data_list:
-        print(ele)
-    print('''
+        f.write(ele)
+    f.write('''
     global main
         extern printf
     section .text
@@ -554,7 +540,7 @@ print_header()
 print_all_instr()
 print_cll_module_instr()
 
-
-
+# close file
+f.close()
 
 
