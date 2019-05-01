@@ -188,7 +188,7 @@ def p_display_statement_str(p):
     '''
     display_statement : DISPLAY LPAREN STRING RPAREN SEMICO
     '''
-
+    p[0] = ('display-string',p[3])
 def p_display_statement_array(p):
     '''
     display_statement : DISPLAY LPAREN NAME LBK NUMBER RBK RPAREN SEMICO
@@ -277,8 +277,8 @@ parser = yacc.yacc()
 
 result = parser.parse('''
                             int64 a = 1;
-
-                            a= a+1+2*3;
+                            display("test");
+                            display("FUCK");
                       ''')
 '''
                  int64 temp =0;
