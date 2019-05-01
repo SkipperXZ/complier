@@ -37,6 +37,7 @@ def spilt_array_name(array_var):
             return (name,int(index))
         else:
             return (name,index)
+
 def is_var_index_array(array_var):
         arr = spilt_array_name(array_var)
         name = arr[0]
@@ -75,6 +76,7 @@ def error_duplicate_define_var():
     sys.exit('Duplicate Variable')
 
 def is_define_var(var):
+
     if '[' in var:
         print(var)
         for i in range(len(array_list)):
@@ -89,11 +91,11 @@ def is_define_var(var):
 def is_define_not_duplicate(var):
     for i in range(len(array_list)):
         if '[' in var:
-            if(array_var_list[i] == spilt_array_name(var)[0]):
+            if array_list[i] == spilt_array_name(var)[0]:
                 error_duplicate_define_var()
                 return False
         else:
-            if(array_var_list[i] == spilt_array_name(var)):
+            if array_list[i] == var :
                 error_duplicate_define_var()
                 return False
     for i in range(len(var_list)):
@@ -109,13 +111,15 @@ def pop(register):
     print_instr('pop  %s'%register)
 
 def base_statement(stmt):
+
     if stmt:
         if stmt[0] == 'multi':
             recursion_statement(stmt[1],stmt[2])
         if stmt[0] == 'declare-value':  
+
             declar_var(stmt[1])
         if stmt[0] == 'assign-value':
-             assign_func(stmt)
+            assign_func(stmt)
         if stmt[0] == 'declare-array':
             declar_array(stmt[1],stmt[2])
         if stmt[0] == 'for':
@@ -138,6 +142,7 @@ def recursion_statement(stmt1,stmt2):
     base_statement(stmt2)
 
 def assign_func(stmt):
+
     if type(stmt[1]) is str:
        if is_define_var(stmt[1]):
             pass
@@ -149,8 +154,10 @@ def assign_func(stmt):
     if  type(stmt[2]) is int:
         print_instr("mov    %s,%s"%(convert_var(stmt[1]),convert_var(stmt[2])))
     elif type(stmt[2]) is str:
+      
         print_instr("push    rax")
         if is_array(stmt[2]):
+            
             var = spilt_array_name(stmt[2])
             name = var[0]
             index =var[1]
@@ -338,7 +345,7 @@ def display_str(string):
     print_instr("pop rbx")
     print_instr("pop rax")
         
-    count += 1;
+    count += 1
 def display_var(var_name):
     if is_define_var(var_name):
         print_instr("push rax")

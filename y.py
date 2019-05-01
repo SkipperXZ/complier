@@ -276,9 +276,11 @@ parser = yacc.yacc()
 
 
 result = parser.parse('''
-                            int64 a = 1;
-                            display("test");
-                            display("FUCK");
+                            int64 [5] a = [1,3,4,5,6];
+                            int64 i =5;
+                            a[1] = a[i];
+                            
+
                       ''')
 '''
                  int64 temp =0;
