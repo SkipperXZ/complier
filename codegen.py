@@ -66,8 +66,6 @@ def print_all_instr():
         f.write(ele) 
         f.write('\n\t')
 
-def print_instr_without_check_array(instr):  
-    instr_list.append(instr)   
             
 def error_undefine_var():
     sys.exit('Undenfied Variable')
@@ -93,8 +91,7 @@ def is_define_not_duplicate(var):
                 error_duplicate_define_var()
                 return False
         else:
-            if(array_var_list[i] == spilt_array_name(var)):
-                error_duplicate_define_var()
+            if(array_var_list[i] == var):
                 return False
     for i in range(len(var_list)):
         if(var_list[i] == var):
@@ -293,8 +290,10 @@ def display_array(arr_name,arr_index):
         print_instr("push rbx")
         print_instr("push rcx")
         print_instr("push rdx")
-        print_instr("sub  rsp, 20h  ")           
-        print_instr_without_check_array("mov   rcx,%s[%s]"%(arr_name,arr_index*4))
+        print_instr("sub  rsp, 20h")      
+        print_instr("mov rcx, decformat") 
+        #print_instr("mov   rcx, %s[%s]"%(arr_name,arr_index*4))
+        
         print_instr("call    printf  ")
         print_instr("add     rsp, 20h ")
 
@@ -310,7 +309,7 @@ def display_array(arr_name,arr_index):
         mul_func(arr_index,4)
         print_instr("mov   esi,eax")
         print_instr("mov rcx, decformat")             
-        print_instr_without_check_array("mov   rcx,%s[si]"%arr_name)
+        print_instr("mov   rcx,%s[si]"%arr_name)
         print_instr("movq rdx, xmm1")
         print_instr("call printf")
         print_instr("add rsp, 40 ")
@@ -338,7 +337,7 @@ def display_str(string):
     print_instr("pop rbx")
     print_instr("pop rax")
         
-    count += 1;
+    count += 1
 def display_var(var_name):
     if is_define_var(var_name):
         print_instr("push rax")

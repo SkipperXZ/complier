@@ -277,8 +277,8 @@ parser = yacc.yacc()
 
 result = parser.parse('''
                             int64 a = 1;
-                            display("test");
-                            display("FUCK");
+                            array [3] b = [1,2,3];
+                            display(b[1]);
                       ''')
 '''
                  int64 temp =0;
