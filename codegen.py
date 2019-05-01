@@ -21,7 +21,7 @@ def convert_var(t):
     if type(t) is int and '[' not in t:
         return t
     else:
-        return '['str(t)+']'
+        return '['+str(t)+']'
 
 
 def spilt_array_name(array_var):
