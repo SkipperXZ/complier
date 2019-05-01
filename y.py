@@ -276,25 +276,6 @@ parser = yacc.yacc()
 
 
 result = parser.parse('''
-                      
-                             int64 temp =0;
-                      int64 i =0;
-                      int64 max = 0;
-                      array [10] arr = [11,32,43,54,65,65,10,101,1,55];
-                      for(10){
-
-                          temp = arr[i] ;
-                         if(max<temp){
-                              max = (1+arr[i])+(arr[i]+i);
-                          }
-                          
-                          i = i+1;
-                          
-                              }
-                         display(max);
-                      ''')
-'''
-   int64 a =7;
                       int64 b =4;
                       int64 c = 9;
                         if(a<b){
@@ -314,6 +295,25 @@ result = parser.parse('''
                             }
                             
                         }
+                      
+            
+                      ''')
+'''
+                 int64 temp =0;
+                      int64 i =0;
+                      int64 max = 0;
+                      array [10] arr = [11,32,43,54,65,65,10,101,1,55];
+                      for(10){
+
+                          temp = arr[i] ;
+                         if(max<temp){
+                              max = (1+arr[i])+(arr[i]+i);
+                          }
+                          
+                          i = i+1;
+                          
+                              }
+                         display(max);
 '''
 #print(result)
 #print(asm_data)
