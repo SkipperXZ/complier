@@ -3,7 +3,7 @@ import ply.lex as lex
  # List of token names.   This is always required
 tokens = (
     'INT64','ARRAY',
-    'NAME','NUMBER','STRING',
+    'NAME','NUMBER','STRING','HEX',
 	'IF','ELSE','BREAK','FOR','DISPLAY',
     'EQUALS', 'PLUS', 'MINUS', 'TIMES', 'DIVIDE','MOD',
 	'COMMA','SEMICO',
@@ -29,6 +29,7 @@ t_FOR = r"for"
 t_ARRAY = r"array"
 t_DISPLAY = r"display"
 t_STRING = r'\"[a-zA-Z0-9]*\"'
+
 #t_CONST = r'\d+'
 t_EQUALS = r'='
 t_PLUS = r'\+'
@@ -53,6 +54,11 @@ t_LT_OP = r'<'
 
  
  # Define a rule so we can track line numbers
+def t_HEX(t):
+    r'0[xX][a-fA-F0-9]*'
+    #t.value = hex(t.value)
+    return t
+    
 def t_newline(t):
      r'\n+'
      t.lexer.lineno += len(t.value)
@@ -83,7 +89,6 @@ lexer = lex.lex()
  # Test it out
 
 data = '''
-                       
                       '''
  
  # Give the lexer some input

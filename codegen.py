@@ -14,6 +14,7 @@ ELSE_stmt = []
 instr_list = []  
 data_list = ['hexformat: dq "%llx",10,0','decformat: dq "%lld",10,0','newLineMsg dq 0xA, 0xD'] 
 var_list = []
+hex_list = []
 array_var_list = []
 array_list = []
 Error = []
@@ -139,7 +140,7 @@ def recursion_statement(stmt1,stmt2):
     base_statement(stmt2)
 
 def assign_func(stmt):
-
+    #print_instr("push    rax")  
     if type(stmt[1]) is str:
        if is_define_var(stmt[1]):
             pass
@@ -150,9 +151,10 @@ def assign_func(stmt):
 
     if  type(stmt[2]) is int:
         print_instr("mov    %s,%s"%(convert_var(stmt[1]),convert_var(stmt[2])))
+        #print_instr("mov    %s,%s"%(convert_var(stmt[1]),convert_var(stmt[2])))
     elif type(stmt[2]) is str:
       
-        print_instr("push    rax")
+        
         if is_array(stmt[2]):
             
             var = spilt_array_name(stmt[2])
@@ -178,10 +180,12 @@ def assign_func(stmt):
         print_instr("mov    rsi,rax")  
         print_instr("pop    rax")
         print_instr("mov    [%s+rsi],rax"%name)  
-        print_instr("pop    rax")
+
     else:
         print_instr("mov  %s,rax"%convert_var(stmt[1]))
-        print_instr("pop    rax")
+        
+    #print_instr("pop    rax")
+
    
 
 def cal_func(stmt):
@@ -291,39 +295,30 @@ def mod_func(first,second):
 
 
 def display_array(arr_name,arr_index):
-    
     if(type(arr_index) is int):
         print_instr("push rax")
         print_instr("push rbx")
         print_instr("push rcx")
         print_instr("push rdx")
-        print_instr("sub  rsp, 20h")      
-        print_instr("mov rcx, decformat") 
-        #print_instr("mov   rcx, %s[%s]"%(arr_name,arr_index*4))
+
         
-        print_instr("call    printf  ")
-        print_instr("add     rsp, 20h ")
+        print_instr("push    rax")
+        mul_func(arr_index,8)
+        print_instr("mov    rsi,rax")  
+        print_instr("pop    rax")
+        print_instr("mov    rax,[%s+rsi]"%arr_name) 
+        print_instr("mov rcx, decformat")    
+        print_instr("movq xmm1, rax")
+        print_instr("movq rdx, xmm1")
+        print_instr("call printf")
+        print_instr("add rsp, 40 ")
 
         print_instr("pop rdx")
         print_instr("pop rcx")
         print_instr("pop rbx")
         print_instr("pop rax")
-    else:
-        print_instr("push rax")
-        print_instr("push rbx")
-        print_instr("push rcx")
-        print_instr("push rdx")
-        mul_func(arr_index,4)
-        print_instr("mov   esi,eax")
-        print_instr("mov rcx, decformat")             
-        print_instr("mov   rcx,%s[si]"%arr_name)
-        print_instr("movq rdx, xmm1")
-        print_instr("call printf")
-        print_instr("add rsp, 40 ")
-        print_instr("pop rcx")
-        print_instr("pop rbx")
-        print_instr("pop rax")
-
+        
+   
 def display_str(string): 
     global count
 
@@ -346,15 +341,41 @@ def display_str(string):
         
     count += 1
 def display_var(var_name):
+    
     if is_define_var(var_name):
+        # check if var is hex
+        
+        for ele in hex_list:
+            if var_name in ele:
+                print_instr("push rax")
+                print_instr("push rbx")
+                print_instr("push rcx")
+                print_instr("push rdx")
+            
+                print_instr("mov rcx, hexformat") 
+                print_instr("movq xmm1, qword [%s]"%var_name)
+                print_instr("movq rdx, xmm1")
+                print_instr("call printf")
+                print_instr("mov rcx, newLineMsg")
+                print_instr("call printf")
+                print_instr("add rsp, 40 ")
+            
+                print_instr("pop rdx")
+                print_instr("pop rcx")
+                print_instr("pop rbx")
+                print_instr("pop rax")
+                return
+            
         print_instr("push rax")
         print_instr("push rbx")
         print_instr("push rcx")
         print_instr("push rdx")
 
-        print_instr("mov rcx, decformat")     
+        print_instr("mov rcx, decformat") 
         print_instr("movq xmm1, qword [%s]"%var_name)
         print_instr("movq rdx, xmm1")
+        print_instr("call printf")
+        print_instr("mov rcx, newLineMsg")
         print_instr("call printf")
         print_instr("add rsp, 40 ")
 
@@ -391,7 +412,8 @@ def declar_array(size,stmt):
  
 def compare_value_if(stmt1,stmt2):
     global count_IF
-
+    print_instr(' mov        rax,  %s'%(convert_var(stmt1[1])))
+    print_instr(' mov        rbx,  %s'%(convert_var(stmt1[2])))
     print_instr(' cmp        rax,    rbx')
     if stmt1[0] == '>':
         print_instr(' jle        nextInstr%d'%(count_IF))
@@ -448,8 +470,13 @@ def declar_var(stmt):
         var_name = stmt[1]
         val = stmt[2]
     if is_define_not_duplicate(var_name):
-        var_list.append(var_name)
-        data_list.append("       %s     dq      %d"%(var_name,val))
+        var_list.append(var_name)        
+        if not '0x' in str(val):
+            data_list.append("       %s     dq      %d"%(var_name,val))
+        else:
+            hex_list.append(var_name)
+            data_list.append("       %s     dq      %s"%(var_name,val))
+        
 
 
 def loop_statement(num, stmt):

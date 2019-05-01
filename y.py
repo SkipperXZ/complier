@@ -57,6 +57,7 @@ def p_expression_number(p):
       expression : signed_number
                  | NUMBER
                  | NAME
+                 | HEX
     '''
     p[0] = p[1]
     
@@ -94,11 +95,6 @@ def p_expression(p):
     else:
         p[0] = p[2]
     
-def p_init_declarator_notassign(p): 
-    '''
-    init_declarator : declarator
-    '''
-    p[0] = p[1]
     
 def p_init_declarator_array_constant(p):
     '''
@@ -196,6 +192,7 @@ def p_display_statement_array(p):
     '''
     
     p[0] = ('display-array',p[3],p[5])
+    
 def p_display_statement_var(p):
     '''
     display_statement : DISPLAY LPAREN NAME RPAREN SEMICO
@@ -203,6 +200,8 @@ def p_display_statement_var(p):
     '''
     
     p[0] = ('display-var',p[3])
+    
+
 def p_compound_empty_statement(p):
     '''
     compound_statement : LCB RCB
@@ -276,12 +275,17 @@ parser = yacc.yacc()
 
 
 result = parser.parse('''
-                            int64 a = 1;
-                            array [3] b = [1,2,3];
-                            display(b[1]);
+                          int64 a = 0x13f;
+                          int64 c = -1;
+                          int64 d = -1;
+                          
+                          d = c+d;
+                          display(d);
+                          display(a);
                       ''')
 '''
-                 int64 temp =0;
+                         
+                         int64 temp =0;
                       int64 i =0;
                       int64 max = 0;
                       array [10] arr = [11,32,43,54,65,65,10,101,1,55];
@@ -289,7 +293,7 @@ result = parser.parse('''
 
                           temp = arr[i] ;
                          if(max<temp){
-                              max = (1+arr[i])+(arr[i]+i);
+                              max = temp;
                           }
                           
                           i = i+1;
@@ -297,7 +301,7 @@ result = parser.parse('''
                               }
                          display(max);
 '''
-#print(result)
+print(result)
 #print(asm_data)
 
 #base_statement(result)
