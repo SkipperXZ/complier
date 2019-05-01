@@ -276,27 +276,9 @@ parser = yacc.yacc()
 
 
 result = parser.parse('''
-                      int64 b =4;
-                      int64 c = 9;
-                        if(a<b){
-                            if(a<c){
-                                display(a);
-                            }
-                            else{
-                                display(c);
-                            }
-                        }
-                        else{
-                            if(b<c){
-                                display(b);
-                            }
-                            else{
-                                display(c);
-                            }
-                            
-                        }
-                      
-            
+                      array [2] b = [1,2];
+                      int64 a = 1;
+                      display(a);
                       ''')
 '''
                  int64 temp =0;

@@ -2,7 +2,7 @@ from y import result
 import sys
 
 # write file
-f = open('D:/Assembly/a.asm', 'w+')
+f = open('a.asm', 'w+')
 
 #loop count
 count = 0
@@ -20,7 +20,7 @@ Error = []
 def convert_var(t):
     if type(t) is int:
         return t
-    else type(t) is str:
+    else:
         return '['+t+']'
 
 def spilt_array_name(array_var):
@@ -292,7 +292,6 @@ def assign_array(name,stmt):
 '''
 def compare_value_if(stmt1,stmt2):
     global count_IF
-    if 
     print_instr(' mov        rax,  %s'%(convert_var(stmt[1])))
     print_instr(' mov        rbx,  %s'%(convert_var(stmt[2])))
     print_instr(' cmp        rax,    rbx')
