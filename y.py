@@ -276,9 +276,6 @@ parser = yacc.yacc()
 
 
 result = parser.parse('''
-                      array [2] b = [1,2];
-                      int64 a = 1;
-                      display(a);
                       ''')
 '''
                  int64 temp =0;

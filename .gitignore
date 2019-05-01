@@ -20,5 +20,5 @@ asm/A.MAP
 asm/A.EXE
 asm/a.asm
 *.COM
-*.asm
-*.exe
+a.asm
+a.exe

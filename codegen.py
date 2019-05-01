@@ -18,10 +18,10 @@ array_var_list = []
 Error = []
 
 def convert_var(t):
-    if type(t) is int:
+    if type(t) is int and '[' not in t:
         return t
     else:
-        return '['+t+']'
+
 
 def spilt_array_name(array_var):
         name = array_var.split('[')[0]
@@ -219,7 +219,6 @@ def display_str(str):
     print_instr("call printstr")
         
 def display_var(var_name):
-    
     if not check_var_not_duplicate(var_name):
         print_instr("push rax")
         print_instr("push rbx")
@@ -292,8 +291,7 @@ def assign_array(name,stmt):
 '''
 def compare_value_if(stmt1,stmt2):
     global count_IF
-    print_instr(' mov        rax,  %s'%(convert_var(stmt[1])))
-    print_instr(' mov        rbx,  %s'%(convert_var(stmt[2])))
+
     print_instr(' cmp        rax,    rbx')
     if stmt1[0] == '>':
         print_instr(' jle        nextInstr%d'%(count_IF))
@@ -314,8 +312,8 @@ def compare_value_if(stmt1,stmt2):
 
 def compare_value_ifelse(stmt1,stmt2):
     global count_IF
-    print_instr(' mov        rax,  %s'%(convert_var(stmt[1])))
-    print_instr(' mov        rbx,  %s'%(convert_var(stmt[2])))
+    print_instr(' mov        rax,  %s'%(convert_var(stmt1[1])))
+    print_instr(' mov        rbx,  %s'%(convert_var(stmt1[2])))
     print_instr(' cmp        rax,    rbx')
     if stmt1[0] == '>':
         print_instr(' jle         else%d'%(count_IF))
