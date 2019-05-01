@@ -24,12 +24,19 @@ def convert_var(t):
     else:
         return '['+str(t)+']'
 
+def is_array(str):
+    if '[' in str:
+        return True
+    else:
+        return False
 
 def spilt_array_name(array_var):
         name = array_var.split('[')[0]
         index = ((array_var.split('[')[1]).split(']'))[0]
-        return (name,index)
-
+        if index.isdigit():
+            return (name,int(index))
+        else:
+            return (name,index)
 def is_var_index_array(array_var):
         arr = spilt_array_name(array_var)
         name = arr[0]
@@ -40,16 +47,6 @@ def is_var_index_array(array_var):
             return False 
 
 def print_instr(instr):
-    if '[' not in instr:
-        pass
-    else:
-        tempinstr = instr
-        for i in var_list:
-            if i in instr and '[' in i:
-                splited_1 = i.split('[')
-                splited_2 = splited_1[1].split(']')
-                tempinstr = tempinstr.replace(i, splited_1[0]+'['+ str(int(splited_2[0])*4) +']'+splited_2[1])
-        instr = tempinstr
     instr_list.append(instr)    
 
 
@@ -79,8 +76,9 @@ def error_duplicate_define_var():
 
 def is_define_var(var):
     if '[' in var:
+        print(var)
         for i in range(len(array_list)):
-            if(array_var_list[i] == spilt_array_name(var)[0]):
+            if array_list[i] == spilt_array_name(var)[0]:
                 return True
     for i in range(len(var_list)):
         if(var_list[i] == var):
@@ -144,25 +142,50 @@ def assign_func(stmt):
        if is_define_var(stmt[1]):
             pass
     if type(stmt[2]) is str:
-        if is_define_var(stmt[1]):
+        if is_define_var(stmt[2]):
             pass
+
+
     if  type(stmt[2]) is int:
         print_instr("mov    %s,%s"%(convert_var(stmt[1]),convert_var(stmt[2])))
     elif type(stmt[2]) is str:
         print_instr("push    rax")
-        print_instr("mov    rax,%s"%convert_var(stmt[1]))    
-        print_instr("mov    %s,rax"%convert_var(stmt[1]))
-        print_instr("pop    rax")
+        if is_array(stmt[2]):
+            var = spilt_array_name(stmt[2])
+            name = var[0]
+            index =var[1]
+            print_instr("push    rax")
+            mul_func(index,8)
+            print_instr("mov    rsi,rax")  
+            print_instr("pop    rax")
+            print_instr("mov    rax,[%s+rsi]"%name)    
+        else:
+            print_instr("mov    rax,%s"%convert_var(stmt[2])) 
+        
     elif type(stmt[2]) is tuple:
         cal_func(stmt[2])
+    if is_array(stmt[1]):
+        var = spilt_array_name(stmt[1])
+        name = var[0]
+        index = var[1]
+        print(convert_var(index))
+        print_instr("push    rax")
+        mul_func(index,8)
+        print_instr("mov    rsi,rax")  
+        print_instr("pop    rax")
+        print_instr("mov    [%s+rsi],rax"%name)  
+        print_instr("pop    rax")
+    else:
         print_instr("mov  %s,rax"%convert_var(stmt[1]))
+        print_instr("pop    rax")
+   
 
 def cal_func(stmt):
     if type(stmt[1]) is str:
        if is_define_var(stmt[1]):
             pass
     if type(stmt[2]) is str:
-        if is_define_var(stmt[1]):
+        if is_define_var(stmt[2]):
             pass
     if type(stmt[1]) is tuple and type(stmt[2]) is tuple:
         cal_func(stmt[1])
@@ -270,7 +293,6 @@ def display_array(arr_name,arr_index):
         print_instr("push rbx")
         print_instr("push rcx")
         print_instr("push rdx")
-
         print_instr("sub  rsp, 20h  ")           
         print_instr_without_check_array("mov   rcx,%s[%s]"%(arr_name,arr_index*4))
         print_instr("call    printf  ")
@@ -330,11 +352,12 @@ def recur_assign_array(stmt):
         array_var_list.append(stmt[1])
         
 def declar_array(size,stmt):
-    if not is_define_not_duplicate(stmt[0]):
+    if is_define_not_duplicate(stmt[0]):
         global index
         recur_assign_array(stmt[1])
         temp_str = '%s dd '%stmt[0]
         array_list.append(stmt[0])
+        print(array_list)
         temp_ele = ''
         for ele in array_var_list:
             temp_ele += str(ele) 
