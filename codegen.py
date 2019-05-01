@@ -14,21 +14,8 @@ var_list = []
 array_var_list = []
 Error = []
 
-def spilt_array_name(array_var):
-        name = array_var.split('[')[0]
-        index = ((array_var.split('[')[1]).split(']'))[0]
-        return (name,index)
-
-def is_var_index_array(array_var):
-        arr = spilt_array_name(array_var)
-        name = arr[0]
-        index = arr[1]
-        if not index.isdigit():
-            return True
-        else:
-            return False 
-
-        
+    
+            
 def print_instr(instr):
     if '[' not in instr:
         pass
@@ -42,39 +29,6 @@ def print_instr(instr):
         instr = tempinstr
     instr_list.append(instr)    
 
-def print_cll_module_instr():
-
-    print('''jmp finish
-        printvar:
-            mov bx,0
-            jmp digit
-
-        digit:
-            mov edx,0
-            mov ecx,10
-            div ecx
-            inc bx
-            push edx
-
-            cmp eax,0
-            jg digit
-            mov cx,bx
-            jmp print
-        print: 
-            pop edx
-            add edx,48
-            mov  ah, 02h    
-            int 21h
-            loop print	
-            ret
-        printstr: 
-            mov  ah, 02h    
-            int 21h
-            ret
-        finish:
-            ret
-        end main''')
-
 def print_header():
     print('''
       .model tiny
@@ -86,7 +40,7 @@ def print_header():
         .code
         org 100h
     ''')
-
+    
 def print_all_instr():
 
     for ele in instr_list:
@@ -116,8 +70,19 @@ def base_statement(stmt):
             recursion_statement(stmt[1],stmt[2])
         if stmt[0] == 'declare-value':  
             declar_var(stmt[1])
-        if stmt[0] == 'assign-value':
-             assign_func(stmt)
+        if stmt[0] == 'assign-value':  
+            if type(stmt[1]) is str and check_var_not_duplicate(stmt[1]):
+                sys.exit("Unidentified Variable")
+            elif (type(stmt[1]) is str  and type(stmt[2]) is int) or (type(stmt[1]) is str  and type(stmt[2]) is str):
+                if check_var_not_duplicate(stmt[1]) or check_var_not_duplicate(stmt[2]):
+                    sys.exit("Unidentified Variable")
+                print_instr("mov    %s,[%s]"%(stmt[1],stmt[2]))
+                return
+            elif type(stmt[2]) is tuple:
+                cal_func(stmt[2])
+            else:
+                print_instr("mov  rax,[%s]"%(stmt[1]))
+            assign_value(stmt[1])
         if stmt[0] == 'declare-array':
             declar_array(stmt[1],stmt[2])
 #        if stmt[0] == 'assign-array':
@@ -137,129 +102,58 @@ def base_statement(stmt):
         if stmt[0] == 'display-array':
             display_array(stmt[1],stmt[2])
             
-
-
-
-def assign_func(stmt):
-    
-    print('[' in stmt[1] and is_var_index_array(stmt[1]))
-    if '[' in stmt[1] and '[' in stmt[2]:
-        if is_var_index_array(stmt[1]) and is_var_index_array(stmt[2]):
-            arr1 = spilt_array_name(stmt[1])
-            arr2 = spilt_array_name(stmt[2])
-            print_instr("push   esi")
-            mul_func(arr2[1],4)
-            print_instr("mov    esi,eax")
-            print_instr("mov    eax,%s[si]"%arr2[0])
-            print_instr("push   eax")
-            mul_func(arr1[1],4)
-            print_instr("mov    esi,eax")
-            print_instr("pop   eax")
-            print_instr("mov    %s[si],eax"%arr1[0])
-            print_instr("pop   esi")
-            return
-    if '[' in stmt[1] and is_var_index_array(stmt[1]):
-        arr = spilt_array_name(stmt[1])
-        print_instr("push   esi")
-        mul_func(arr[1],4)
-        print_instr("mov    esi,eax")
-        
-        if type(stmt[2]) is tuple:
-         
-            cal_func(stmt[2])
-            print_instr("mov    %s[si],eax"%arr[0])
-        else:
-            print_instr("mov    eax,%s"%stmt[2])
-            print_instr("mov    %s[si],eax"%arr[0])
-        print_instr("pop   esi")
-        return
-
-    if '[' in stmt[2] and is_var_index_array(stmt[2]):   
-        
-        arr = spilt_array_name(stmt[2])
-        print_instr("push   esi")
-        mul_func(arr[1],4)
-        print_instr("mov    esi,eax")
-        print_instr("mov    eax,%s[si]"%arr[0])
-        print_instr("mov    %s,eax"%stmt[1])
-        print_instr("pop   esi")
-        return
-    
-    if type(stmt[1]) is str and check_var_not_duplicate(stmt[1]):
-        sys.exit("Unidentified Variable assign func")
-    elif (type(stmt[1]) is str  and type(stmt[2]) is int):
-        if check_var_not_duplicate(stmt[1]) or check_var_not_duplicate(stmt[2]):
-            sys.exit("Unidentified Variable assign func")
-        print_instr("mov    %s,%s"%(stmt[1],stmt[2]))
-        return
-    elif (type(stmt[1]) is str  and type(stmt[2]) is str):
-        if check_var_not_duplicate(stmt[1]) or check_var_not_duplicate(stmt[2]):
-            sys.exit("Unidentified Variable assign func")
-        print_instr("push    eax")
-        print_instr("mov    eax,%s"%stmt[2])    
-        print_instr("mov    %s,eax"%stmt[1])
-        print_instr("pop    eax")
-        return
-    elif type(stmt[2]) is tuple:
-        cal_func(stmt[2])
-    else:
-        print_instr("mov  eax,%s"%(stmt[1]))
-    assign_value(stmt[1])
-
-
-
-
-
-
-
 def display_array(arr_name,arr_index):
     
     if(type(arr_index) is int):
-        print_instr("push eax")
-        print_instr("push ebx")
-        print_instr("push ecx")
-        print_instr("push edx")
-        print_instr_without_check_array("mov   eax,%s[%s]"%(arr_name,arr_index*4))
-        print_instr("call printvar")
-        print_instr("pop edx")
-        print_instr("pop ecx")
-        print_instr("pop ebx")
-        print_instr("pop eax")
+        print_instr("push rax")
+        print_instr("push rbx")
+        print_instr("push rcx")
+        print_instr("push rdx")
+        print_instr("sub  rsp, 20h  ")           
+        print_instr_without_check_array("mov   rcx,%s[%s]"%(arr_name,arr_index*4))
+        print_instr("call    printf  ")
+        print_instr("add     rsp, 20h ")
+        print_instr("pop rdx")
+        print_instr("pop rcx")
+        print_instr("pop rbx")
+        print_instr("pop rax")
     else:
-        print_instr("push eax")
-        print_instr("push ebx")
-        print_instr("push ecx")
-        print_instr("push edx")
-        mul_func(arr_index,4)
-        print_instr("mov   esi,eax")
-        print_instr_without_check_array("mov   eax,%s[si]"%arr_name)
-        print_instr("call printvar")
-        print_instr("pop edx")
-        print_instr("pop ecx")
-        print_instr("pop ebx")
-        print_instr("pop eax")
+        print_instr("push rax")
+        print_instr("push rbx")
+        print_instr("push rcx")
+        print_instr("push rdx")
+        mul_func("i",4)
+        print_instr("mov  rsi,rax")
+        print_instr("sub  rsp, 20h  ")  
+        print_instr_without_check_array("mov   rax,%s[si]"%arr_name)
+        print_instr("call printf  ")
+        print_instr("add  rsp, 20h ")
+        print_instr("pop rdx")
+        print_instr("pop rcx")
+        print_instr("pop rbx")
+        print_instr("pop rax")
 
 def display_str(str): 
     print_instr("mov msg,%s"%str)
-    print_instr("mov edx,offset msg")
+    print_instr("mov rdx,offset msg")
     print_instr("call printstr")
         
 def display_var(var_name):
     
     if not check_var_not_duplicate(var_name):
-        print_instr("push eax")
-        print_instr("push ebx")
-        print_instr("push ecx")
-        print_instr("push edx")
-        print_instr("mov   eax,%s"%var_name)
+        print_instr("push rax")
+        print_instr("push rbx")
+        print_instr("push rcx")
+        print_instr("push rdx")
+        print_instr("mov   rax,[%s]"%var_name)
         print_instr("call printvar")
-        print_instr("pop edx")
-        print_instr("pop ecx")
-        print_instr("pop ebx")
-        print_instr("pop eax")
+        print_instr("pop rdx")
+        print_instr("pop rcx")
+        print_instr("pop rbx")
+        print_instr("pop rax")
         
     else:
-        sys.exit('Unidentified Variable display var')
+        sys.exit('Unidentified Variable')
 def recur_assign_array(stmt):
     if type(stmt[0]) is tuple:
         recur_assign_array(stmt[0])
@@ -313,9 +207,9 @@ def assign_array(name,stmt):
 '''
 def compare_value_if(stmt1,stmt2):
     global count_IF
-    print_instr(' mov        eax,  %s'%(stmt1[1]))
-    print_instr(' mov        ebx,  %s'%(stmt1[2]))
-    print_instr(' cmp        eax,    ebx')
+    print_instr(' mov        rax,  %s'%(stmt1[1]))
+    print_instr(' mov        rbx,  %s'%(stmt1[2]))
+    print_instr(' cmp        rax,    rbx')
     if stmt1[0] == '>':
         print_instr(' jle        nextInstr%d'%(count_IF))
         ELSE_stmt.append(count_IF)
@@ -335,9 +229,9 @@ def compare_value_if(stmt1,stmt2):
 
 def compare_value_ifelse(stmt1,stmt2):
     global count_IF
-    print_instr(' mov        eax,  %s'%(stmt1[1]))
-    print_instr(' mov        ebx,  %s'%(stmt1[2]))
-    print_instr(' cmp        eax,    ebx')
+    print_instr(' mov        rax,  %s'%(stmt1[1]))
+    print_instr(' mov        rbx,  %s'%(stmt1[2]))
+    print_instr(' cmp        rax,    rbx')
     if stmt1[0] == '>':
         print_instr(' jle         else%d'%(count_IF))
         ELSE_stmt.append(count_IF)
@@ -363,94 +257,68 @@ def else_statement(stmt):
 
 def assign_value(var_name):
     if check_var_not_duplicate(var_name):
-        sys.exit("Unidentified Variable assign value")
-    print_instr("mov  %s,eax"%var_name)
+        sys.exit("Unidentified Variable")
+    
+    print_instr("mov  %s,rax"%var_name)
 
 def cal_func(stmt):
     if type(stmt[1]) is tuple and type(stmt[2]) is tuple:
         cal_func(stmt[1])
-        push('eax')
+        push('rax')
         cal_func(stmt[2])
         if stmt[0] == '+':
-            print_instr('pop   ebx')
-            print_instr('add   eax,ebx')
+            print_instr('pop   rbx')
+            print_instr('add   rax,rbx')
         elif stmt[0] == '-':
-            print_instr('pop   ebx')
-            print_instr('sub   eax,ebx')
+            print_instr('pop   rbx')
+            print_instr('sub   rax,rbx')
         elif stmt[0] == '*':
-            print_instr('pop   ebx')
-            print_instr('mul   ebx')
+            print_instr('pop   rbx')
+            print_instr('mul   rbx')
         elif stmt[0] == '/':
-            print_instr('mov  edx, 0')
-            print_instr('pop   ecx')
-            print_instr('div   ecx')  
+            print_instr('mov  rdx, 0')
+            print_instr('pop   rcx')
+            print_instr('div   rcx')  
         elif stmt[0] == '%':
-            print_instr('mov  edx, 0')
-            print_instr('pop   ecx')
-            print_instr('div   ecx')  
-            print_instr('mov  eax,edx')
+            print_instr('mov  rdx, 0')
+            print_instr('pop   rcx')
+            print_instr('div   rcx')  
+            print_instr('mov  rax,rdx')
     elif type(stmt[1]) is tuple:
         cal_func(stmt[1])
-        if stmt[2] in '[' and is_var_index_array(stmt[2]):
-            mul_func(arr2[1],4)
-            print_instr("mov    esi,eax")
-            print_instr("mov    eax,%s[si]"%arr2[0])
         if stmt[0] == '+':
-            print_instr('add  eax,%s'%stmt[2])
+            print_instr('add  rax,%s'%stmt[2])
         elif stmt[0] == '-':
-            print_instr('sub  eax,%s'%stmt[2])
+            print_instr('sub  rax,%s'%stmt[2])
         elif stmt[0] == '*':
-            print_instr('mov  ebx,%s'%stmt[2])
-            print_instr('mul  ebx')
+            print_instr('mov  rbx,%s'%stmt[2])
+            print_instr('mul  rbx')
         elif stmt[0] == '/':
-            print_instr('mov  edx, 0')
-            print_instr('mov  ecx,%s'%stmt[2])
-            print_instr('div  ecx')  
+            print_instr('mov  rdx, 0')
+            print_instr('mov  rcx,%s'%stmt[2])
+            print_instr('div  rcx')  
         elif stmt[0] == '%':
-            print_instr('mov  edx, 0')
-            print_instr('mov  ecx,%s'%stmt[2])
-            print_instr('div  ecx')   
-            print_instr('mov  eax,edx') 
+            print_instr('mov  rdx, 0')
+            print_instr('mov  rcx,%s'%stmt[2])
+            print_instr('div  rcx')   
+            print_instr('mov  rax,rdx') 
     elif type(stmt[2]) is tuple:
         cal_func(stmt[2])
         if stmt[0] == '+':
-            print_instr('add  eax,%s'%stmt[1])
+            print_instr('add  rax,%s'%stmt[1])
         elif stmt[0] == '-':
-            print_instr('sub  eax,%s'%stmt[1])
+            print_instr('sub  rax,%s'%stmt[1])
         elif stmt[0] == '*':
-            print_instr('mov  ebx,%s'%stmt[1])
-            print_instr('mul  ebx')
+            print_instr('mov  rbx,%s'%stmt[1])
+            print_instr('mul  rbx')
         elif stmt[0] == '/':
-            print_instr('mov  ecx,%s'%stmt[1])
-            print_instr('div  ecx')
+            print_instr('mov  rcx,%s'%stmt[1])
+            print_instr('div  rcx')
         elif stmt[0] == '%':
-            print_instr('mov  ecx,%s'%stmt[1])
-            print_instr('div  ecx')     
-            print_instr('mov  eax,edx') 
+            print_instr('mov  rcx,%s'%stmt[1])
+            print_instr('div  rcx')     
+            print_instr('mov  rax,rdx') 
     elif stmt[0] == '+':
-        
-        if type(stmt[1]) is str:
-            if  '[' in stmt[1] and is_var_index_array(stmt[1]):
-                arr = spilt_array_name(stmt[1])
-                mul_func(arr[1],4)
-                print_instr("    push esi")
-                print_instr("mov    esi,eax")
-                print_instr("mov    eax,%s[si]"%arr[0])
-                print_instr('add  eax,%s'%stmt[2])
-                print_instr("    pop esi")
-                return
-
-        elif type(stmt[2]) is str:
-            if '[' in stmt[2] and is_var_index_array(stmt[2]):
-                arr = spilt_array_name(stmt[2])
-                mul_func(arr[1],4)
-                print_instr("    push esi")
-                print_instr("mov    esi,eax")
-                print_instr("mov    eax,%s[si]"%arr[0])
-                print_instr('add  eax,%s'%stmt[1])
-                print_instr("    pop esi")
-                return
-
         add_func(stmt[1],stmt[2])
     elif stmt[0] == '-':
         sub_func(stmt[1],stmt[2]) 
@@ -461,47 +329,44 @@ def cal_func(stmt):
     elif stmt[0] == '%':
         mod_func(stmt[1],stmt[2])          
 
-
-#def add_array_func():
-
 def add_func(first,second):
     if (type(first) is str and check_var_not_duplicate(first)) or (type(second) is str and check_var_not_duplicate(second)):
-        Error.append("Unidentified Variable add")
+        Error.append("Unidentified Variable")
         sys.exit(Error)
-    print_instr('mov  eax,%s'%first)
-    print_instr('add  eax,%s'%second)
+    print_instr('mov  rax,%s'%first)
+    print_instr('add  rax,%s'%second)
 
  
 def sub_func(first,second):
     if (type(first) is str and check_var_not_duplicate(first)) or (type(second) is str and check_var_not_duplicate(second)):
         sys.exit("Unidentified Variable")    
-    print_instr('mov  eax,%s'%first)
-    print_instr('sub  eax,%s'%second)
+    print_instr('mov  rax,%s'%first)
+    print_instr('sub  rax,%s'%second)
 
 def mul_func(first,second):
     if (type(first) is str and check_var_not_duplicate(first)) or (type(second) is str and check_var_not_duplicate(second)):
-        sys.exit("Unidentified Variable mul")  
-    print_instr('mov  eax,%s'%first)
-    print_instr('mov  ebx,%s'%second)
-    print_instr('mul  ebx')    
+        sys.exit("Unidentified Variable")  
+    print_instr('mov  rax,%s'%first)
+    print_instr('mov  rbx,%s'%second)
+    print_instr('mul  rbx')    
     
 
 def div_func(first,second):
     if (type(first) is str and check_var_not_duplicate(first)) or (type(second) is str and check_var_not_duplicate(second)):
         sys.exit("Unidentified Variable")
-    print_instr('mov  edx, 0')
-    print_instr('mov  eax,%s'%first)
-    print_instr('mov  ecx,%s'%second)
-    print_instr('div  ecx')    
+    print_instr('mov  rdx, 0')
+    print_instr('mov  rax,%s'%first)
+    print_instr('mov  rcx,%s'%second)
+    print_instr('div  rcx')    
  
 def mod_func(first,second):
     if (type(first) is str and check_var_not_duplicate(first)) or (type(second) is str and check_var_not_duplicate(second)):
         sys.exit("Unidentified Variable")
-    print_instr('mov  edx, 0')
-    print_instr('mov  eax,%s'%first)
-    print_instr('mov  ecx,%s'%second)
-    print_instr('div  ecx')    
-    print_instr('mov  eax,edx')  
+    print_instr('mov  rdx, 0')
+    print_instr('mov  rax,%s'%first)
+    print_instr('mov  rcx,%s'%second)
+    print_instr('div  rcx')    
+    print_instr('mov  rax,rdx')  
 
 def recursion_statement(stmt1,stmt2):
     base_statement(stmt1)
@@ -551,7 +416,6 @@ base_statement(result)
 
 print_header()
 print_all_instr()
-print_cll_module_instr()
 
 
 
