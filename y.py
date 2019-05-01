@@ -276,6 +276,7 @@ parser = yacc.yacc()
 
 
 result = parser.parse('''
+                        int64 a =7;
                       int64 b =4;
                       int64 c = 9;
                         if(a<b){
