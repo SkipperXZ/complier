@@ -42,39 +42,6 @@ def print_instr(instr):
         instr = tempinstr
     instr_list.append(instr)    
 
-def print_cll_module_instr():
-
-    print('''jmp finish
-        printvar:
-            mov bx,0
-            jmp digit
-
-        digit:
-            mov edx,0
-            mov ecx,10
-            div ecx
-            inc bx
-            push edx
-
-            cmp eax,0
-            jg digit
-            mov cx,bx
-            jmp print
-        print: 
-            pop edx
-            add edx,48
-            mov  ah, 02h    
-            int 21h
-            loop print	
-            ret
-        printstr: 
-            mov  ah, 02h    
-            int 21h
-            ret
-        finish:
-            ret
-        ''')
-
 def print_header():
     print('''
     section .data
@@ -552,7 +519,6 @@ base_statement(result)
 
 print_header()
 print_all_instr()
-print_cll_module_instr()
 
 
 
