@@ -556,8 +556,25 @@ def declar_array(size,stmt):
  
 def compare_value_if(stmt1,stmt2):
     global count_IF
-    print_instr(' mov        rax,  %s'%(convert_var(stmt1[1])))
-    print_instr(' mov        rbx,  %s'%(convert_var(stmt1[2])))
+    if  is_array(stmt1[2]) and is_array(stmt1[1]):
+        mov_array_to_rax(stmt1[2])
+        print_instr('mov        rbx,rax')
+        print_instr('push       rbx')
+        mov_array_to_rax(stmt1[1])
+        print_instr('pop       rbx')
+    elif  is_array(stmt1[2]):
+        mov_array_to_rax(stmt1[2])
+        print_instr('mov        rbx,rax')
+        print_instr('mov       rax,  %s'%(convert_var(stmt1[1])))
+    elif is_array(stmt1[1]):
+        mov_array_to_rax(stmt1[1])
+        print_instr(' mov        rbx,  %s'%(convert_var(stmt1[2])))
+    else:
+        
+        print_instr(' mov        rax,  %s'%(convert_var(stmt1[1])))
+        print_instr(' mov        rbx,  %s'%(convert_var(stmt1[2])))
+
+
     print_instr(' cmp        rax,    rbx')
     if stmt1[0] == '>':
         print_instr(' jle        nextInstr%d'%(count_IF))
@@ -578,9 +595,26 @@ def compare_value_if(stmt1,stmt2):
 
 def compare_value_ifelse(stmt1,stmt2):
     global count_IF
-    print_instr(' mov        rax,  %s'%(convert_var(stmt1[1])))
-    print_instr(' mov        rbx,  %s'%(convert_var(stmt1[2])))
+    if  is_array(stmt1[2]) and is_array(stmt1[1]):
+
+        mov_array_to_rax(stmt1[2])
+        print_instr('mov        rbx,rax')
+        print_instr('push       rbx')
+        mov_array_to_rax(stmt1[1])
+        print_instr('pop       rbx')
+    elif  is_array(stmt1[2]):
+        mov_array_to_rax(stmt1[2])
+        print_instr('mov        rbx,rax')
+        
+        print_instr('mov       rax,  %s'%(convert_var(stmt1[1])))
+    elif is_array(stmt1[1]):
+        mov_array_to_rax(stmt1[1])
+        print_instr(' mov        rbx,  %s'%(convert_var(stmt1[2])))
+    else:
+        print_instr(' mov        rax,  %s'%(convert_var(stmt1[1])))
+        print_instr(' mov        rbx,  %s'%(convert_var(stmt1[2])))
     print_instr(' cmp        rax,    rbx')
+
     if stmt1[0] == '>':
         print_instr(' jle         else%d'%(count_IF))
         ELSE_stmt.append(count_IF)
