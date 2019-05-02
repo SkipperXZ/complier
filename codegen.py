@@ -2,7 +2,7 @@ from y import result
 import sys
 
 # write file
-f = open('a.asm', 'w+')
+f = open('asm/a.asm', 'w+')
 
 #loop count
 count = 0
@@ -195,13 +195,16 @@ def cal_func(stmt):
             print_instr('mul   rbx')
         elif stmt[0] == '/':
             print_instr('mov  rdx, 0')
-            print_instr('pop   rcx')
-            print_instr('div   rcx')  
-        elif stmt[0] == '%':
             print_instr('mov   rcx,rax')
-            print_instr('mov   rdx, 0')
             print_instr('pop   rax')
-            print_instr('div   rcx')  
+            print_instr('CQO')
+            print_instr('idiv   rcx')  
+        elif stmt[0] == '%':
+            print_instr('mov  rdx, 0')
+            print_instr('mov   rcx,rax')
+            print_instr('pop   rax')
+            print_instr('CQO')
+            print_instr('idiv   rcx')  
             print_instr('mov  rax,rdx')
     elif type(stmt[1]) is tuple:
         cal_func(stmt[1])
@@ -229,23 +232,27 @@ def cal_func(stmt):
             if is_array(stmt[2]):
                 cal_index_esi(stmt[2])
                 print_instr('mov  rdx, 0')
+                print_instr('CQO')
                 print_instr('mov  rcx,[%s+rsi]'%spilt_array_name(stmt[2])[0])
-                print_instr('div  rcx')  
+                print_instr('idiv  rcx')  
             else:
                 print_instr('mov  rdx, 0')
+                print_instr('CQO')
                 print_instr('mov  rcx,%s'%convert_var(stmt[2]))
-                print_instr('div  rcx')  
+                print_instr('idiv  rcx')  
         elif stmt[0] == '%':
             if is_array(stmt[2]):
                 cal_index_esi(stmt[2])
                 print_instr('mov  rdx, 0')
+                print_instr('CQO')
                 print_instr('mov  rcx,[%s+rsi]'%spilt_array_name(stmt[2])[0])
-                print_instr('div  rcx')   
+                print_instr('idiv  rcx')   
                 print_instr('mov  rax,rdx') 
             else:
                 print_instr('mov  rdx, 0')
+                print_instr('CQO')
                 print_instr('mov  rcx,%s'%convert_var(stmt[2]))
-                print_instr('div  rcx')   
+                print_instr('idiv  rcx')   
                 print_instr('mov  rax,rdx') 
     elif type(stmt[2]) is tuple:
         cal_func(stmt[2])
@@ -272,21 +279,25 @@ def cal_func(stmt):
         elif stmt[0] == '/':
             if is_array(stmt[1]):
                 cal_index_esi(stmt[1])
+                print_instr('CQO')
                 print_instr('mov  rdx, 0')
                 print_instr('mov  rcx,[%s+rsi]'%spilt_array_name(stmt[1])[0])
-                print_instr('div  rcx')  
+                print_instr('idiv  rcx')  
             else:
+                print_instr('CQO')
                 print_instr('mov  rdx, 0')
                 print_instr('mov  rcx,%s'%convert_var(stmt[1]))
-                print_instr('div  rcx')  
+                print_instr('idiv  rcx')  
         elif stmt[0] == '%':
             if is_array(stmt[1]):
                 cal_index_esi(stmt[1])
+                print_instr('CQO')
                 print_instr('mov  rdx, 0')
                 print_instr('mov  rcx,[%s+rsi]'%spilt_array_name(stmt[1])[0])
                 print_instr('div  rcx')   
                 print_instr('mov  rax,rdx') 
             else:
+                print_instr('CQO')
                 print_instr('mov  rdx, 0')
                 print_instr('mov  rcx,%s'%convert_var(stmt[1]))
                 print_instr('div  rcx')   
@@ -361,43 +372,52 @@ def div_func(first,second):
     print_instr('mov  rdx, 0')
     if is_array(first) and is_array(second):
         mov_array_to_rax(first)
+        print_instr('CQO')
         cal_index_esi(second)
         print_instr('mov  rcx,[%s+rsi]'%spilt_array_name(second)[0])
-        print_instr('div  rcx')  
+        print_instr('idiv  rcx')  
     elif is_array(first):
         mov_array_to_rax(first)
+        print_instr('CQO')
         print_instr('mov  rcx,%s'%convert_var(second))
-        print_instr('div  rcx')  
+        
+        print_instr('idiv  rcx')  
     elif is_array(second):
         print_instr('mov  rax,%s'%convert_var(first))
+        print_instr('CQO')
         cal_index_esi(second)
         print_instr('mov  rcx,[%s+rsi]'%spilt_array_name(second)[0])
-        print_instr('div  rcx')  
+        print_instr('idiv  rcx')  
     else:
         print_instr('mov  rax,%s'%convert_var(first))
+        print_instr('CQO')
         print_instr('mov  rcx,%s'%convert_var(second))
-        print_instr('div  rcx')    
+        print_instr('idiv  rcx')    
  
 def mod_func(first,second):
     print_instr('mov  rdx, 0')
     if is_array(first) and is_array(second):
         mov_array_to_rax(first)
+        print_instr('CQO')
         cal_index_esi(second)
         print_instr('mov  rcx,[%s+rsi]'%spilt_array_name(second)[0])
         print_instr('div  rcx')  
     elif is_array(first):
         mov_array_to_rax(first)
+        print_instr('CQO')
         print_instr('mov  rcx,%s'%convert_var(second))
-        print_instr('div  rcx')  
+        print_instr('idiv  rcx')  
     elif is_array(second):
         print_instr('mov  rax,%s'%convert_var(first))
+        print_instr('CQO')
         cal_index_esi(second)
         print_instr('mov  rcx,[%s+rsi]'%spilt_array_name(second)[0])
-        print_instr('div  rcx')  
+        print_instr('idiv  rcx')  
     else:
         print_instr('mov  rax,%s'%convert_var(first))
+        print_instr('CQO')
         print_instr('mov  rcx,%s'%convert_var(second))
-        print_instr('div  rcx')   
+        print_instr('idiv  rcx')   
     print_instr('mov  rax,rdx')  
 
 def mov_array_to_rax(array):
