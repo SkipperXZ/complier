@@ -2,7 +2,7 @@ from y import result
 import sys
 
 # write file
-f = open('asm/a.asm', 'w+')
+f = open('a.asm', 'w+')
 
 #loop count
 count = 0
@@ -152,7 +152,8 @@ def assign_func(stmt):
 
 
     if  type(stmt[2]) is int:
-        print_instr("mov    %s,%s"%(convert_var(stmt[1]),convert_var(stmt[2])))
+         print_instr("mov    rax,%s"%convert_var(stmt[2])) 
+        #print_instr("mov    %s,%s"%(convert_var(stmt[1]),convert_var(stmt[2])))
     elif type(stmt[2]) is str:
         
         if is_array(stmt[2]):
@@ -445,7 +446,7 @@ def display_array(arr_name,arr_index):
         print_instr("push rcx")
         print_instr("push rdx")
 
-        
+        print_instr("sub rsp, 40 ")
         print_instr("push    rax")
         mul_func(arr_index,8)
         print_instr("mov    rsi,rax")  
@@ -472,6 +473,7 @@ def display_str(string):
     print_instr("push rcx")
     print_instr("push rdx")
 
+    print_instr("sub rsp, 40 ")
     print_instr("mov rcx, tempstr"+str(count))     
     print_instr("call printf")
     print_instr("mov rcx, newLineMsg")
@@ -496,6 +498,7 @@ def display_var(var_name):
                 print_instr("push rcx")
                 print_instr("push rdx")
             
+                print_instr("sub rsp, 40 ")
                 print_instr("mov rcx, hexformat") 
                 print_instr("movq xmm1, qword [%s]"%var_name)
                 print_instr("movq rdx, xmm1")
@@ -515,6 +518,7 @@ def display_var(var_name):
         print_instr("push rcx")
         print_instr("push rdx")
 
+        print_instr("sub rsp, 40 ")
         print_instr("mov rcx, decformat") 
         print_instr("movq xmm1, qword [%s]"%var_name)
         print_instr("movq rdx, xmm1")

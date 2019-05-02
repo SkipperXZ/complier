@@ -28,9 +28,7 @@ t_BREAK = r"break"
 t_FOR = r"for"
 t_ARRAY = r"array"
 t_DISPLAY = r"display"
-t_STRING = r'\"[a-zA-Z0-9]*\"'
-
-#t_CONST = r'\d+'
+t_STRING = r'[a-zA-Z0-9]?\"(\\.|[^\\"])*\"'
 t_EQUALS = r'='
 t_PLUS = r'\+'
 t_MINUS = r'-'
