@@ -3,7 +3,9 @@ import sys
 # write file
 
 #loop count
-count = 0
+count_loop = 0
+temp = 0
+count_str_label = 0
 count_IF = 1
 index = 0
 ELSE_stmt = []
@@ -110,7 +112,7 @@ def pop(register):
     print_instr('pop  %s'%register)
 
 def base_statement(stmt):
-
+    global temp
     if stmt:
         if stmt[0] == 'multi':
             recursion_statement(stmt[1],stmt[2])
@@ -122,6 +124,9 @@ def base_statement(stmt):
             declar_array(stmt[1],stmt[2])
         if stmt[0] == 'for':
             loop_statement(stmt[1],stmt[2])
+            temp -= 1
+        if stmt == 'break':
+            print_instr('jmp break'+str(temp))
         if stmt[0] == 'if-else':
             compare_value_ifelse(stmt[1],stmt[2])
         if stmt[0] == 'else':
@@ -463,16 +468,16 @@ def display_array(arr_name,arr_index):
         
    
 def display_str(string): 
-    global count
+    global count_str_label
 
-    data_list.append('tempstr'+str(count)+': dq '+string+' ,10 ,0')
+    data_list.append('tempstr'+str(count_str_label)+': dq '+string+' ,10 ,0')
     print_instr("push rax")
     print_instr("push rbx")
     print_instr("push rcx")
     print_instr("push rdx")
 
     print_instr("sub rsp, 40 ")
-    print_instr("mov rcx, tempstr"+str(count))     
+    print_instr("mov rcx, tempstr"+str(count_str_label))     
     print_instr("call printf")
     print_instr("mov rcx, newLineMsg")
     print_instr("call printf")
@@ -483,7 +488,7 @@ def display_str(string):
     print_instr("pop rbx")
     print_instr("pop rax")
         
-    count += 1
+    count_str_label += 1
 def display_var(var_name):
     
     if is_define_var(var_name):
@@ -660,16 +665,22 @@ def declar_var(stmt):
 
 
 def loop_statement(num, stmt):
-    global count
-    temp_count = count
-    count += 1
+    global count_loop
+    global temp
+    temp_count = count_loop
+    temp = temp_count
+    count_loop += 1
+    
     print_instr('mov	rcx, '+ str(num))
     print_instr('for'+str(temp_count)+':')
     print_instr('push rcx')
     base_statement(stmt)
     print_instr('pop rcx')
     print_instr('loop for'+str(temp_count))
-
-
+    print_instr('jmp notbreak'+str(temp_count))
+    print_instr('break'+str(temp_count)+':')
+    print_instr('pop rcx')
+    print_instr('notbreak'+str(temp_count)+':')
+    
 
 
