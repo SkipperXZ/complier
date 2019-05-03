@@ -269,39 +269,12 @@ def p_jump_statement(p):
 def p_error(p):
      print("Syntax error in input!")
 
+def parse(input):
+    parser = yacc.yacc()
+    result = parser.parse(input)
+    return result
 
  # Build the parser
-parser = yacc.yacc()
 
 
-result = parser.parse('''
-                          int64 a = 0x13f;
-                          int64 c = -1;
-                          int64 d = -1;
-                          
-                          d = c+d;
-                          display(d);
-                          display(a);
-                      ''')
-'''
-                         
-                         int64 temp =0;
-                      int64 i =0;
-                      int64 max = 0;
-                      array [10] arr = [11,32,43,54,65,65,10,101,1,55];
-                      for(10){
 
-                          temp = arr[i] ;
-                         if(max<temp){
-                              max = temp;
-                          }
-                          
-                          i = i+1;
-                          
-                              }
-                         display(max);
-'''
-print(result)
-#print(asm_data)
-
-#base_statement(result)

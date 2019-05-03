@@ -1,8 +1,6 @@
-from y import result
 import sys
 
 # write file
-f = open('a.asm', 'w+')
 
 #loop count
 count = 0
@@ -55,7 +53,7 @@ def print_instr(instr):
     instr_list.append(instr)    
 
 
-def print_header():
+def print_header(f):
     f.write('section .data\n\t')
     for ele in data_list:
         f.write(ele)
@@ -66,7 +64,7 @@ section .text
 main:
 ''')
 
-def print_all_instr():
+def print_all_instr(f):
     for ele in instr_list:
         f.write(ele) 
         f.write('\n\t')
@@ -673,15 +671,5 @@ def loop_statement(num, stmt):
     print_instr('loop for'+str(temp_count))
 
 
-
-print(result)
-base_statement(result)
-
-print_header()
-print_all_instr()
-
-# close file
-f.write('ret')
-f.close()
 
 
