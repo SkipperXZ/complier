@@ -22,7 +22,11 @@ def convert_var(t):
     if type(t) is int:
         return t
     else:
-        return '['+str(t)+']'
+        if is_define_var(t):
+            return '['+str(t)+']'
+        else:
+            error_undefine_var()
+            return False
 
 def is_array(str1):
     if not type(str1) is int :
@@ -72,7 +76,7 @@ def print_all_instr(f):
 
             
 def error_undefine_var():
-    sys.exit('Undenfied Variable')
+    sys.exit('Undefied Variable')
 def error_duplicate_define_var():
     sys.exit('Duplicate Variable')
 
