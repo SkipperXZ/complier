@@ -1,5 +1,4 @@
 import sys
-
 # write file
 
 #loop count
@@ -546,21 +545,26 @@ def recur_assign_array(stmt):
         array_var_list.append(stmt[1])
         
 def declar_array(size,stmt):
-    if is_define_not_duplicate(stmt[0]):
-        global index
-        recur_assign_array(stmt[1])
-        temp_str = '%s dq '%stmt[0]
-        array_list.append(stmt[0])
-        print(array_list)
-        temp_ele = ''
-        for ele in array_var_list:
-            temp_ele += str(ele) 
-            if array_var_list[len(array_var_list)-1] != ele:
-                temp_ele += ' , '
-        data_list.append(temp_str + temp_ele)
-        array_var_list.clear()
-        index = 0
- 
+    if type(stmt) is str:
+        if is_define_not_duplicate(stmt):
+            data_list.append(stmt+' TIMES '+str(size)+' dq 0')
+    else:
+        if is_define_not_duplicate(stmt[0]):
+            global index
+            recur_assign_array(stmt[1])
+            temp_str = '%s dq '%stmt[0]
+            array_list.append(stmt[0])
+            print(array_list)
+            temp_ele = ''
+            for ele in array_var_list:
+                temp_ele += str(ele) 
+                if array_var_list[len(array_var_list)-1] != ele:
+                    temp_ele += ' , '
+            data_list.append(temp_str + temp_ele)
+            array_var_list.clear()
+            index = 0
+        
+            
 def compare_value_if(stmt1,stmt2):
     global count_IF
     if  is_array(stmt1[2]) and is_array(stmt1[1]):

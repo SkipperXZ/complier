@@ -112,12 +112,16 @@ def p_array_init_declarator(p):
     init_declarator_array : declarator EQUALS LBK array_declarator RBK
     '''
     p[0] = (p[1], p[4])
+def p_array_allocate_declarator(p):
+    '''
+    init_declarator_array : declarator
+    '''
+    p[0] = p[1]  
 def p_array_number(p):
     '''
     array_declarator : NUMBER
     '''
     p[0] = p[1]
-    
 def p_array_declarator(p):
     '''
     array_declarator : array_declarator COMMA NUMBER
@@ -126,7 +130,7 @@ def p_array_declarator(p):
     
 def p_array_declaration(p):
     '''
-    declaration : declaration_specifiers LBK NUMBER RBK init_declarator_array SEMICO
+    declaration : ARRAY LBK NUMBER RBK init_declarator_array SEMICO
     '''
     p[0] = ('declare-array',p[3],p[5])
     
@@ -152,7 +156,7 @@ def p_declarator(p):
     
 def p_declaration(p):
     '''
-    declaration  : declaration_specifiers init_declarator SEMICO
+    declaration  : INT64 init_declarator SEMICO
     '''
     p[0] = ('declare-value',p[2])
 
@@ -162,12 +166,6 @@ def p_assign_exist_id(p):
     '''
     p[0] = p[1]
     
-def p_declaration_specifiers(p):
-    '''
-    declaration_specifiers : INT64
-                           | ARRAY
-    '''
-    p[0] = p[1]
     
 def p_statement(p):
     '''
@@ -275,6 +273,5 @@ def parse(input):
     return result
 
  # Build the parser
-
 
 
