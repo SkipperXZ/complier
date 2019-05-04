@@ -443,11 +443,6 @@ def cal_index_esi(array):
 
 def display_array(arr_name,arr_index):
     if(type(arr_index) is int):
-        print_instr("push rax")
-        print_instr("push rbx")
-        print_instr("push rcx")
-        print_instr("push rdx")
-
         print_instr("sub rsp, 40 ")
         print_instr("push    rax")
         mul_func(arr_index,8)
@@ -461,35 +456,18 @@ def display_array(arr_name,arr_index):
         print_instr("mov rcx, newLineMsg")
         print_instr("call printf")
         print_instr("add rsp, 40 ")
-
-        print_instr("pop rdx")
-        print_instr("pop rcx")
-        print_instr("pop rbx")
-        print_instr("pop rax")
-        
    
 def display_str(string): 
     global count_str_label
-
     data_list.append('tempstr'+str(count_str_label)+': dq '+string+' ,10 ,0')
-    print_instr("push rax")
-    print_instr("push rbx")
-    print_instr("push rcx")
-    print_instr("push rdx")
-
     print_instr("sub rsp, 40 ")
     print_instr("mov rcx, tempstr"+str(count_str_label))     
     print_instr("call printf")
     print_instr("mov rcx, newLineMsg")
     print_instr("call printf")
     print_instr("add rsp, 40 ")
-
-    print_instr("pop rdx")
-    print_instr("pop rcx")
-    print_instr("pop rbx")
-    print_instr("pop rax")
-        
     count_str_label += 1
+    
 def display_var(var_name):
     
     if is_define_var(var_name):
@@ -497,11 +475,6 @@ def display_var(var_name):
         
         for ele in hex_list:
             if var_name in ele:
-                print_instr("push rax")
-                print_instr("push rbx")
-                print_instr("push rcx")
-                print_instr("push rdx")
-            
                 print_instr("sub rsp, 40 ")
                 print_instr("mov rcx, hexformat") 
                 print_instr("movq xmm1, qword [%s]"%var_name)
@@ -510,18 +483,8 @@ def display_var(var_name):
                 print_instr("mov rcx, newLineMsg")
                 print_instr("call printf")
                 print_instr("add rsp, 40 ")
-            
-                print_instr("pop rdx")
-                print_instr("pop rcx")
-                print_instr("pop rbx")
-                print_instr("pop rax")
                 return
             
-        print_instr("push rax")
-        print_instr("push rbx")
-        print_instr("push rcx")
-        print_instr("push rdx")
-
         print_instr("sub rsp, 40 ")
         print_instr("mov rcx, decformat") 
         print_instr("movq xmm1, qword [%s]"%var_name)
@@ -531,10 +494,6 @@ def display_var(var_name):
         print_instr("call printf")
         print_instr("add rsp, 40 ")
 
-        print_instr("pop rdx")
-        print_instr("pop rcx")
-        print_instr("pop rbx")
-        print_instr("pop rax")
         
 def recur_assign_array(stmt):
     if type(stmt[0]) is tuple:
@@ -682,7 +641,9 @@ def loop_statement(num, stmt):
     print_instr('push rcx')
     base_statement(stmt)
     print_instr('pop rcx')
-    print_instr('loop for'+str(temp_count))
+    print_instr('dec rcx')
+    print_instr('cmp rcx, 0')
+    print_instr('jne for'+str(temp_count))
     print_instr('jmp notbreak'+str(temp_count))
     print_instr('break'+str(temp_count)+':')
     print_instr('pop rcx')
