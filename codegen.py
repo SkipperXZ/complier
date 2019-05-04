@@ -458,6 +458,8 @@ def display_array(arr_name,arr_index):
         print_instr("movq xmm1, rax")
         print_instr("movq rdx, xmm1")
         print_instr("call printf")
+        print_instr("mov rcx, newLineMsg")
+        print_instr("call printf")
         print_instr("add rsp, 40 ")
 
         print_instr("pop rdx")
