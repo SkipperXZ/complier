@@ -1,0 +1,27 @@
+int64 i = 0;
+int64 j = 0;
+int64 temp = 0;
+array [10] a = [1,5,3,4,8,0,1,9,7,10];
+
+for(10){
+	j = i+1;
+	for(10){
+		if(j == 10){
+			break;
+		}
+		if(a[j] < a[i]){
+			temp = a[i];
+			a[i] = a[j];
+			a[j] = temp;
+		}
+		
+		j = j+1;
+	}
+	i = i+1;
+}
+i = 0;
+
+for(10){
+	display(a[i]);
+	i = i+1;
+}
