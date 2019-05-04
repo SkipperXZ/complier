@@ -113,6 +113,11 @@ def p_init_declarator(p):
     init_declarator : declarator EQUALS expression
     '''
     p[0] = ('assign-value', p[1], p[3])
+def p_init_allocate_declarator(p):
+    '''
+    init_declarator : declarator
+    '''
+    p[0] = ('assign-value', p[1], 0)
 def p_array_init_declarator(p):
     '''
     init_declarator_array : declarator EQUALS LBK array_declarator RBK
