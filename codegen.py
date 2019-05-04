@@ -76,7 +76,7 @@ def print_all_instr(f):
 
             
 def error_undefine_var():
-    sys.exit('Undefied Variable')
+    sys.exit('Undefined Variable')
 def error_duplicate_define_var():
     sys.exit('Duplicate Variable')
 
