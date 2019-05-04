@@ -429,7 +429,6 @@ def mov_array_to_rax(array):
 
 def mov_rax_to_array(array):    
     cal_index_esi(array) 
-    print_instr("pop    rax")
     print_instr("mov    [%s+rsi],rax"%spilt_array_name(array)[0])  
 
 def cal_index_esi(array):
@@ -442,7 +441,6 @@ def cal_index_esi(array):
     print_instr('pop rax')
 
 def display_array(arr_name,arr_index):
-    if(type(arr_index) is int):
         print_instr("sub rsp, 40 ")
         print_instr("push    rax")
         mul_func(arr_index,8)
