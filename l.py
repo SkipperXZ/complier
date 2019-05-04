@@ -8,7 +8,7 @@ tokens = (
     'EQUALS', 'PLUS', 'MINUS', 'TIMES', 'DIVIDE','MOD',
 	'COMMA','SEMICO',
 	'LPAREN','RPAREN','LCB','RCB','LBK','RBK',
-	'EQ_OP','NE_OP','GT_OP','LT_OP'
+	'EQ_OP','NE_OP','GT_OP','LT_OP','GE_OP','LE_OP'
 )
 RESERVED = {
     "int64": "INT64",
@@ -47,6 +47,8 @@ t_EQ_OP = r'=='
 t_NE_OP = r'!='
 t_GT_OP = r'>'
 t_LT_OP = r'<'
+t_GE_OP = r'>='
+t_LE_OP = r'<='
  
  # A regular expression rule with some action code
 
@@ -86,7 +88,7 @@ lexer = lex.lex()
  
  # Test it out
 
-data = '''
+data = ''' 
                       '''
  
  # Give the lexer some input

@@ -558,6 +558,12 @@ def compare_value_if(stmt1,stmt2):
     elif stmt1[0] == '!=':
         print_instr('je        nextInstr%d'%(count_IF))
         ELSE_stmt.append(count_IF)
+    elif stmt1[0] == '>=':
+        print_instr('jl        nextInstr%d'%(count_IF))
+        ELSE_stmt.append(count_IF)
+    elif stmt1[0] == '<=':
+        print_instr('jg        nextInstr%d'%(count_IF))
+        ELSE_stmt.append(count_IF)
     count_IF+=1
     base_statement(stmt2)
     print_instr('nextInstr%s:'%(ELSE_stmt[len(ELSE_stmt)-1]))
@@ -596,6 +602,12 @@ def compare_value_ifelse(stmt1,stmt2):
         ELSE_stmt.append(count_IF)
     elif stmt1[0] == '!=':
         print_instr('je        else%d'%(count_IF))
+        ELSE_stmt.append(count_IF)
+    elif stmt1[0] == '>=':
+        print_instr('jl        else%d'%(count_IF))
+        ELSE_stmt.append(count_IF)
+    elif stmt1[0] == '<=':
+        print_instr('jg        else%d'%(count_IF))
         ELSE_stmt.append(count_IF)
     temp_count_IFELSE = count_IF
     count_IF+=1

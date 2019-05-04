@@ -72,6 +72,8 @@ def p_expression(p):
                | expression GT_OP expression
                | expression EQ_OP expression
                | expression NE_OP expression
+               | expression GE_OP expression
+               | expression LE_OP expression
                | LPAREN expression RPAREN
     '''
     if p[2] == '+':
@@ -92,6 +94,10 @@ def p_expression(p):
         p[0] = ('==',p[1],p[3])
     elif p[2] == '!=':
         p[0] = ('!=',p[1],p[3])
+    elif p[2] == '>=':
+        p[0] = ('>=',p[1],p[3])
+    elif p[2] == '<=':
+        p[0] = ('<=',p[1],p[3])
     else:
         p[0] = p[2]
     
