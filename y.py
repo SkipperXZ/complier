@@ -120,11 +120,13 @@ def p_array_allocate_declarator(p):
 def p_array_number(p):
     '''
     array_declarator : NUMBER
+                     | signed_number
     '''
     p[0] = p[1]
 def p_array_declarator(p):
     '''
     array_declarator : array_declarator COMMA NUMBER
+                     | array_declarator COMMA signed_number
     '''
     p[0] = (p[1],p[3])
     

@@ -425,11 +425,11 @@ def mod_func(first,second):
 
 def mov_array_to_rax(array):
     cal_index_esi(array)
-    print_instr("mov    rax,[%s+rsi]"%spilt_array_name(array)[0])    
+    print_instr("mov rax,[%s+rsi]"%spilt_array_name(array)[0])    
 
 def mov_rax_to_array(array):    
     cal_index_esi(array) 
-    print_instr("mov    [%s+rsi],rax"%spilt_array_name(array)[0])  
+    print_instr("mov [%s+rsi],rax"%spilt_array_name(array)[0])  
 
 def cal_index_esi(array):
     print_instr('push rax')
@@ -437,16 +437,16 @@ def cal_index_esi(array):
     name = var[0]
     index =var[1]
     mul_func(index,8)
-    print_instr("mov    rsi,rax")  
+    print_instr("mov rsi,rax")  
     print_instr('pop rax')
 
 def display_array(arr_name,arr_index):
         print_instr("sub rsp, 40 ")
-        print_instr("push    rax")
+        print_instr("push rax")
         mul_func(arr_index,8)
-        print_instr("mov    rsi,rax")  
-        print_instr("pop    rax")
-        print_instr("mov    rax,[%s+rsi]"%arr_name) 
+        print_instr("mov rsi,rax")  
+        print_instr("pop rax")
+        print_instr("mov rax,[%s+rsi]"%arr_name) 
         print_instr("mov rcx, decformat")    
         print_instr("movq xmm1, rax")
         print_instr("movq rdx, xmm1")
@@ -528,35 +528,35 @@ def compare_value_if(stmt1,stmt2):
     global count_IF
     if  is_array(stmt1[2]) and is_array(stmt1[1]):
         mov_array_to_rax(stmt1[2])
-        print_instr('mov        rbx,rax')
-        print_instr('push       rbx')
+        print_instr('mov rbx,rax')
+        print_instr('push rbx')
         mov_array_to_rax(stmt1[1])
-        print_instr('pop       rbx')
+        print_instr('pop rbx')
     elif  is_array(stmt1[2]):
         mov_array_to_rax(stmt1[2])
-        print_instr('mov        rbx,rax')
-        print_instr('mov       rax,  %s'%(convert_var(stmt1[1])))
+        print_instr('mov rbx,rax')
+        print_instr('mov rax,  %s'%(convert_var(stmt1[1])))
     elif is_array(stmt1[1]):
         mov_array_to_rax(stmt1[1])
-        print_instr(' mov        rbx,  %s'%(convert_var(stmt1[2])))
+        print_instr('mov rbx,  %s'%(convert_var(stmt1[2])))
     else:
         
-        print_instr(' mov        rax,  %s'%(convert_var(stmt1[1])))
-        print_instr(' mov        rbx,  %s'%(convert_var(stmt1[2])))
+        print_instr('mov rax,  %s'%(convert_var(stmt1[1])))
+        print_instr('mov rbx,  %s'%(convert_var(stmt1[2])))
 
 
-    print_instr(' cmp        rax,    rbx')
+    print_instr('cmp rax, rbx')
     if stmt1[0] == '>':
-        print_instr(' jle        nextInstr%d'%(count_IF))
+        print_instr('jle        nextInstr%d'%(count_IF))
         ELSE_stmt.append(count_IF)
     elif stmt1[0] == '<':
-        print_instr(' jge         nextInstr%d'%(count_IF))
+        print_instr('jge         nextInstr%d'%(count_IF))
         ELSE_stmt.append(count_IF)
     elif stmt1[0] == '==':
-        print_instr(' jne         nextInstr%d'%(count_IF))
+        print_instr('jne         nextInstr%d'%(count_IF))
         ELSE_stmt.append(count_IF)
     elif stmt1[0] == '!=':
-        print_instr(' je        nextInstr%d'%(count_IF))
+        print_instr('je        nextInstr%d'%(count_IF))
         ELSE_stmt.append(count_IF)
     count_IF+=1
     base_statement(stmt2)
@@ -579,28 +579,28 @@ def compare_value_ifelse(stmt1,stmt2):
         print_instr('mov       rax,  %s'%(convert_var(stmt1[1])))
     elif is_array(stmt1[1]):
         mov_array_to_rax(stmt1[1])
-        print_instr(' mov        rbx,  %s'%(convert_var(stmt1[2])))
+        print_instr('mov        rbx,  %s'%(convert_var(stmt1[2])))
     else:
-        print_instr(' mov        rax,  %s'%(convert_var(stmt1[1])))
-        print_instr(' mov        rbx,  %s'%(convert_var(stmt1[2])))
-    print_instr(' cmp        rax,    rbx')
+        print_instr('mov        rax,  %s'%(convert_var(stmt1[1])))
+        print_instr('mov        rbx,  %s'%(convert_var(stmt1[2])))
+    print_instr('cmp        rax,    rbx')
 
     if stmt1[0] == '>':
-        print_instr(' jle         else%d'%(count_IF))
+        print_instr('jle         else%d'%(count_IF))
         ELSE_stmt.append(count_IF)
     elif stmt1[0] == '<':
-        print_instr(' jge         else%d'%(count_IF))
+        print_instr('jge         else%d'%(count_IF))
         ELSE_stmt.append(count_IF)
     elif stmt1[0] == '==':
-        print_instr(' jne         else%d'%(count_IF))
+        print_instr('jne         else%d'%(count_IF))
         ELSE_stmt.append(count_IF)
     elif stmt1[0] == '!=':
-        print_instr(' je        else%d'%(count_IF))
+        print_instr('je        else%d'%(count_IF))
         ELSE_stmt.append(count_IF)
     temp_count_IFELSE = count_IF
     count_IF+=1
     base_statement(stmt2)
-    print_instr(' jmp      nextInstr%d'%(temp_count_IFELSE))
+    print_instr('jmp      nextInstr%d'%(temp_count_IFELSE))
 
 def else_statement(stmt):
     print_instr('else%s:'%(ELSE_stmt[len(ELSE_stmt)-1]))
